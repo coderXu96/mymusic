@@ -1,40 +1,38 @@
 <template>
   <div>
-    <el-row type="flex" justify="center" align="middle">
+    <el-row type="flex" justify="center" align="middle" style="text-align:center">
       <el-col :span="8">
         <!-- 封面 -->
         <el-image :src="$store.state.music.al.picUrl" class="musicPoster">
         </el-image>
       </el-col>
-      <el-col :span="8" style="text-align: cneter">
-        <div style="font-size: 1.5rem">{{ $store.state.music.name }}</div>
-        <div>
-          <span>{{ $store.state.music.ar[0].name }}</span> -
-          <span>{{ $store.state.music.al.name }}</span>
-        </div>
-        <!--歌词-->
-        <div
-          style="
-            width: 350px;
-            height: 350px;
-            overflow: hidden;
-            margin-top: 25px;
-          "
-        >
-          <div style="overflow-y: auto">
-            <ul>
-              <li
-                v-for="(item, index) in lrcObject"
-                :key="index"
-                :style="{ color: lyricIndex === index ? 'red' : 'black' }"
-              >
-                {{ item.c }}
-              </li>
-            </ul>
+      <el-col :span="8">
+        <div style="text-align: center">
+          <div style="font-size: 2.0rem">{{ $store.state.music.name }}</div>
+          <div style="margin-top: 10px; color: #909399;">
+            <span>{{ $store.state.music.ar[0].name }}</span> -
+            <span>{{ $store.state.music.al.name }}</span>
+          </div>
+          <!--歌词-->
+          <div style="height: 350px; overflow: hidden; margin-top: 25px">
+            <div style="overflow-y: auto">
+              <ul id="lyric">
+                <li
+                  v-for="(item, index) in lrcObject"
+                  :key="index"
+                  :style="{ color: lyricIndex === index ? 'red' : 'black' }"
+                >
+                  {{ item.c }}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </el-col>
-      <el-col :span="8">3</el-col>
+      <el-col :span="8">
+        搜索发现<br>
+        暂未开发
+      </el-col>
     </el-row>
   </div>
 </template>
@@ -63,13 +61,14 @@ export default {
       for (let i = 0; i < this.lrcObject.length; i++) {
         //这里使用小于符号判断是为了 保证回退音乐进度事件的效果实现性
         if (newVal <= parseFloat(this.lrcObject[i].t)) {
+          let lyric = document.querySelector("#lyric");
           if (this.lyricIndex === i - 1) {
             break;
           }
           //找到比当前时间点 大一点的后一位的歌词的索引值
           this.lyricIndex = i - 1;
           //当前距离上方的距离  控制歌词上下滚动
-          var currentTemp = this.$refs.lyric.style.marginTop;
+          var currentTemp = lyric.style.marginTop;
           currentTemp = currentTemp.substr(0, currentTemp.length - 2);
           //滚动距离
           currentTemp = parseInt(currentTemp);
@@ -88,7 +87,8 @@ export default {
              */
             currentTemp = (i - 5) * -35;
             //设置样式
-            this.$refs.lyric.style.marginTop = currentTemp + "px";
+            lyric.style.marginTop = currentTemp + "px";
+            console.log(lyric.style.marginTop);
           }
           //如果当前是最后一句歌词 代表歌曲要放送结束了 将我们的lyricIndex(当前歌词索引值还原成0便于下一曲使用)
           if (this.lyricIndex === this.lrcObject.length - 1) {
@@ -106,9 +106,11 @@ export default {
         .get("lyric", { params: { id: this.$store.state.curId } })
         .then((res) => {
           //获取歌词
-          this.lrc = res.data.lrc.lyric;
-          //解析歌词
-          this.createLrcObj(this.lrc);
+          if (res.data.lrc) {
+            this.lrc = res.data.lrc.lyric;
+            //解析歌词
+            this.createLrcObj(this.lrc);
+          }
         });
     },
 
@@ -171,5 +173,12 @@ export default {
   border: 35px solid black;
   border-radius: 100%;
   box-shadow: 0 0 5px 5px rgb(219, 219, 219);
+}
+#lyric {
+  padding-inline-start: 0px;
+}
+#lyric > li {
+  list-style: none;
+  margin-top: 15px;
 }
 </style>
