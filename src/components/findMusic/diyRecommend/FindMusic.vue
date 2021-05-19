@@ -4,7 +4,6 @@
       <el-menu :default-active="active" :router="true" mode="horizontal">
         <el-menu-item index="/diyRecommend">个性推荐</el-menu-item>
         <el-menu-item index="/musicListPage">歌单</el-menu-item>
-        <el-menu-item index="/djList">主播电台</el-menu-item>
         <el-menu-item index="/musicRank">排行榜</el-menu-item>
         <el-menu-item index="/singerList">歌手</el-menu-item>
         <el-menu-item index="/newMusicList">最新音乐</el-menu-item>
@@ -12,11 +11,13 @@
     </el-header>
 
     <el-main>
-      <router-view
-        ref="child"
-        @setParentMusicUrl="setParentMusicUrl"
-        @setSongListInfo="setSongListInfo"
-      ></router-view>
+      <keep-alive>
+        <router-view
+          ref="child"
+          @setParentMusicUrl="setParentMusicUrl"
+          @setSongListInfo="setSongListInfo"
+        ></router-view>
+      </keep-alive>
     </el-main>
   </el-container>
 </template>

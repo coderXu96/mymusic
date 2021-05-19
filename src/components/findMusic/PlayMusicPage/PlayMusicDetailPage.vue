@@ -1,6 +1,12 @@
+
 <template>
   <div>
-    <el-row type="flex" justify="center" align="middle" style="text-align:center">
+    <el-row
+      type="flex"
+      justify="center"
+      align="middle"
+      style="text-align: center"
+    >
       <el-col :span="8">
         <!-- 封面 -->
         <el-image :src="$store.state.music.al.picUrl" class="musicPoster">
@@ -8,14 +14,14 @@
       </el-col>
       <el-col :span="8">
         <div style="text-align: center">
-          <div style="font-size: 2.0rem">{{ $store.state.music.name }}</div>
-          <div style="margin-top: 10px; color: #909399;">
+          <div style="font-size: 2rem">{{ $store.state.music.name }}</div>
+          <div style="margin-top: 10px; color: #909399">
             <span>{{ $store.state.music.ar[0].name }}</span> -
             <span>{{ $store.state.music.al.name }}</span>
           </div>
           <!--歌词-->
-          <div style="height: 350px; overflow: hidden; margin-top: 25px">
-            <div style="overflow-y: auto">
+          <div style="max-height: 400px; margin-top: 25px; overflow: hidden">
+            <div>
               <ul id="lyric">
                 <li
                   v-for="(item, index) in lrcObject"
@@ -30,12 +36,154 @@
         </div>
       </el-col>
       <el-col :span="8">
-        搜索发现<br>
+        搜索发现<br />
         暂未开发
+      </el-col>
+    </el-row>
+    <el-row
+      v-show="toggle == 1"
+      type="flex"
+      justify="center"
+      style="margin-top: 25px"
+    >
+      <i class="el-icon-loading" style="font-size: 20px"></i>评论加载中
+    </el-row>
+    <el-row v-show="toggle == 2">
+      <el-col :offset="3" :span="15">
+        <h4 style="font-weight: 300" v-if="queryInfo.offset === 0">精彩评论</h4>
+        <!--精彩评论的信息-->
+        <div
+          v-for="(item, index) in hotCommentList"
+          :key="item + index"
+          style="
+            position: relative;
+            border-top: 2px solid rgb(240, 240, 242);
+            border-bottom: 1px solid rgb(240, 240, 242);
+            padding: 15px 0;
+            font-size: 15px;
+          "
+        >
+          <div>
+            <!--用户头像-->
+            <img
+              :src="item.user.avatarUrl"
+              alt=""
+              style="
+                display: inline;
+                width: 50px;
+                height: 50px;
+                border-radius: 25px;
+              "
+            />
+
+            <!--评论信息-->
+            <div style="margin-left: 60px; margin-top: -60px">
+              <p>
+                <span style="color: #4d99de">{{ item.user.nickname }}</span
+                >: {{ item.content }}
+              </p>
+
+              <br v-if="item.beReplied.length > 0" />
+              <!--子评论-->
+              <div
+                v-if="item.beReplied.length > 0"
+                style="background-color: rgb(241, 241, 244); padding: 5px 5px"
+              >
+                <p v-for="(citem, index) in item.beReplied" :key="index">
+                  <span style="color: #4d99de">{{ citem.user.nickname }}</span
+                  >: {{ citem.content }}
+                </p>
+              </div>
+
+              <p
+                style="
+                  display: block;
+                  font-size: 13px;
+                  color: gray;
+                  opacity: 0.7;
+                "
+              >
+                {{ item.time | dateFormat }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h4 style="font-weight: 300; margin-top: 25px">
+          最新评论({{ total }})
+        </h4>
+        <!--所有评论的信息-->
+        <div
+          v-for="(item, index) in commentList"
+          :key="index"
+          style="
+            position: relative;
+            border-top: 2px solid rgb(240, 240, 242);
+            border-bottom: 1px solid rgb(240, 240, 242);
+            padding: 15px 0;
+            font-size: 15px;
+          "
+        >
+          <div>
+            <!--用户头像-->
+            <img
+              :src="item.user.avatarUrl"
+              alt=""
+              style="
+                display: inline;
+                width: 50px;
+                height: 50px;
+                border-radius: 25px;
+              "
+            />
+
+            <!--评论信息-->
+            <div style="margin-left: 60px; margin-top: -60px">
+              <p>
+                <span style="color: #4d99de">{{ item.user.nickname }}</span
+                >: {{ item.content }}
+              </p>
+
+              <br v-if="item.beReplied.length > 0" />
+              <!--子评论-->
+              <div
+                v-if="item.beReplied.length > 0"
+                style="background-color: rgb(241, 241, 244); padding: 5px 5px"
+              >
+                <p v-for="(citem, index) in item.beReplied" :key="index">
+                  <span style="color: #4d99de">@{{ citem.user.nickname }}</span
+                  >: {{ citem.content }}
+                </p>
+              </div>
+
+              <p
+                style="
+                  display: block;
+                  font-size: 13px;
+                  color: gray;
+                  opacity: 0.7;
+                "
+              >
+                {{ item.time | dateFormat }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!--分页-->
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :page-size="queryInfo.limit"
+          :total="total"
+          @current-change="handleCurrentChange"
+        >
+        </el-pagination>
       </el-col>
     </el-row>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -47,11 +195,35 @@ export default {
       lrcObject: [],
       //当前歌词的所位于歌词对象中的索引值(用于帮助高亮)
       lyricIndex: 0,
+
+      //查询评论的信息
+      queryInfo: {
+        id: this.$route.params.id,
+        limit: 10,
+        offset: 0,
+      },
+      //所有评论列表
+      commentList: [],
+      //最热评论列表
+      hotCommentList: [],
+      //评论总数
+      total: 0,
+      //用来显示加载数据,默认不显示
+      toggle: 2,
+      //分页器当前页码
+      cur_page: 1,
     };
   },
+
   created() {
+    //获取音乐的详细信息
+    this.getMusicDetail(this.$route.params.id);
+    //获取歌曲的歌词
     this.getMusicLrc();
+    //查询该歌曲的评论信息
+    this.getMusicComment();
   },
+  
   watch: {
     //监听vuex中的进度条变化
     "$store.state.musicDuration"(newVal) {
@@ -88,7 +260,6 @@ export default {
             currentTemp = (i - 5) * -35;
             //设置样式
             lyric.style.marginTop = currentTemp + "px";
-            console.log(lyric.style.marginTop);
           }
           //如果当前是最后一句歌词 代表歌曲要放送结束了 将我们的lyricIndex(当前歌词索引值还原成0便于下一曲使用)
           if (this.lyricIndex === this.lrcObject.length - 1) {
@@ -99,7 +270,26 @@ export default {
       }
     },
   },
+
   methods: {
+    //根据id获取音乐详情
+    getMusicDetail(musicId) {
+      this.$http.get("song/url", { params: { id: musicId } }).then((res) => {
+        if (res.data.data[0].url !== "") {
+          this.$http
+            .get("song/detail", { params: { ids: musicId } })
+            .then((r) => {
+              this.$store.commit("setMusic", {
+                murl: res.data.data[0].url,
+                detail: r.data.songs[0],
+              });
+              // 获取歌词
+              this.getMusicLrc();
+            });
+        }
+      });
+    },
+
     //获取歌曲的歌词
     getMusicLrc() {
       this.$http
@@ -162,6 +352,33 @@ export default {
         return a.t - b.t;
       });
       this.lrcObject = oLRC.ms;
+    },
+
+    //查询评论
+    getMusicComment() {
+      this.toggle = 1;
+      this.$http
+        .get("comment/music", { params: this.queryInfo })
+        .then((res) => {
+          if (res.data.code !== 200) {
+            this.$notify.error({
+              title: "错误",
+              message: "这是一条错误的提示消息",
+            });
+          } else {
+            this.commentList = res.data.comments;
+            this.hotCommentList = res.data.hotComments;
+            this.total = res.data.total;
+          }
+          this.toggle = 2;
+          this.cur_page = 1;
+        });
+    },
+
+    //分页插件页数改变
+    handleCurrentChange(newPage) {
+      this.queryInfo.offset = (newPage - 1) * this.queryInfo.limit;
+      this.getMusicComment();
     },
   },
 };

@@ -9,26 +9,13 @@
       v-show="toggle == 2"
       @row-dblclick="playMusic"
     >
-      <el-table-column type="index" min-width="10%" align="right">
-        <template slot-scope="scope">
-          <span class="gray">
-            {{
-              scope.$index >= 9 ? scope.$index + 1: "0" + (scope.$index + 1)
-            }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column min-width="8%">
-        <template>
-          <i class="el-icon-star-off toolicon gray"></i>
-          <i class="el-icon-download toolicon gray"></i>
-        </template>
-      </el-table-column>
       <el-table-column
         label="音乐标题"
         prop="name"
-        min-width="40%"
+        min-width="30%"
+        style="cursor: pointer"
       ></el-table-column>
+
       <el-table-column label="歌手" min-width="20%" show-overflow-tooltip>
         <template slot-scope="scope">
           <span
@@ -47,12 +34,14 @@
           </span>
         </template>
       </el-table-column>
+
       <el-table-column
         label="专辑"
         prop="album.name"
         min-width="20%"
         show-overflow-tooltip
       ></el-table-column>
+
       <el-table-column
         label="时长"
         prop="duration"
@@ -107,6 +96,9 @@ export default {
       cur_page: 1,
     };
   },
+   activated(){
+    console.log('我处于活跃');
+  },
   created() {
     //获取搜索结果集
     this.getSearchResult();
@@ -144,6 +136,7 @@ export default {
         });
       this.toggle = 2;
     },
+
     //双击歌曲添加数据进去,并循环播放(向父组件传递参数)
     playMusic(row) {
       this.$http.get("song/url", { params: { id: row.id } }).then((res) => {
@@ -160,6 +153,7 @@ export default {
         }
       });
     },
+
     //分页插件页数改变
     handleCurrentChange(newPage) {
       this.queryInfo.offset = (newPage - 1) * this.queryInfo.limit;

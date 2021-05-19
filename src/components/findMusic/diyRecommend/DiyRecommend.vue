@@ -26,30 +26,8 @@
     <el-main>
       <!-- 推荐歌单 -->
       <p style="margin-bottom: 10px; font-size: 22px">推荐歌单</p>
-      <el-row :gutter="20" class="row-flex">
-        <el-col
-          v-for="(item, index) in musiclist"
-          :key="index"
-          class="mark-img five-eq"
-        >
-          <el-image :src="item.coverImgUrl"></el-image>
-          <p>{{ item.name }}</p>
-          <span class="playCount"
-            ><i class="el-icon-caret-right"></i
-            >{{
-              item.playCount >= 10000
-                ? (item.playCount / 10000).toFixed(0) + "万"
-                : item.playCount
-            }}</span
-          >
-          <!-- 默认不显示 -->
-          <el-image
-            :src="playhover"
-            class="playhover"
-            v-show="false"
-          ></el-image>
-        </el-col>
-      </el-row>
+
+      <music-card :musiclist="musiclist" :hover="true"></music-card>
 
       <!-- 独家放送 -->
       <p style="margin-bottom: 10px; font-size: 22px">独家放送</p>
@@ -142,7 +120,13 @@
 </template>
 
 <script>
+import MusicCard from "../../common/card/MusicCard";
+import { MUSICLIST } from "../../common/card/MusicClass";
+
 export default {
+  components: {
+    MusicCard,
+  },
   data() {
     return {
       //轮播图数据列表
@@ -161,7 +145,6 @@ export default {
       newmusic_icon: require("@/assets/images/newmusic_icon.png"),
     };
   },
-  props: {},
   created() {
     //获取轮播图数据
     this.getbannerinfo();
@@ -183,14 +166,22 @@ export default {
     //点击banner想父组件传递切换对应的音乐,和专辑封面
     // https://autumnfish.cn/song/detail?ids=1471057078
     changeUrl(musicId) {
-      
       if (musicId === null) return;
       this.getMusicUrl(musicId);
       this.getMusicDetail(musicId);
 
       //防止url未获得提交信息到父组件
       if (this.musicUrl !== "") {
-        this.$emit("setParentMusicUrl", this.musicUrl, this.music);
+        this.$store.commit("playMusic", {
+          murl: this.musicUrl,
+          detail: this.music,
+        });
+      } else {
+        this.$notify({
+          title: "警告",
+          message: "歌曲信息未知",
+          type: "warning",
+        });
       }
     },
 
@@ -221,7 +212,18 @@ export default {
           },
         })
         .then((res) => {
-          this.musiclist = res.data.playlists;
+          let temarr = [];
+          for (const item of res.data.playlists) {
+            let linkurl = "/songlist/" + item.id;
+            let tem = new MUSICLIST(
+              item.coverImgUrl,
+              item.name,
+              item.playCount,
+              linkurl
+            );
+            temarr.push(tem);
+          }
+          this.musiclist = temarr;
         });
     },
 

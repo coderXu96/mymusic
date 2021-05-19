@@ -29,33 +29,41 @@ export default new Vuex.Store({
   },
   mutations: {
     // 播放音乐
-    playMusic(state, payload) {
+    playMusic(state,payload) {
+      this.commit('setMusic',payload)
+      this.commit('musicPlaying')
+      state.isPlay = true
+    },
+
+    // 设置音乐信息
+    setMusic(state, payload) {
       state.music = payload.detail
       state.musicUrl = payload.murl
       state.curId = payload.detail.id
       // 调用设置
-      this.commit('setAudioTagsInfo')
+      this.commit('getMusicDuration')
     },
+
+    // 获取音频长度
+    getMusicDuration(state) {
+      let audio = document.querySelector('.playMusicAudio')
+      //获取歌曲的总长度 example: 257s
+      state.totalDuration = audio.duration
+      //获取歌曲时间
+      state.musicDuration = audio.currentTime
+    },
+
     //设置audio的各种信息
-    setAudioTagsInfo(state) {
+    musicPlaying(state) {
       let audio = document.querySelector('.playMusicAudio')
       // 监听audio的timeUpdate事件
       audio.addEventListener("timeupdate", () => {
         // 如果处于被拖动就退出更新
-        if(state.isChange) return
-        //获取歌曲的总长度 example: 257s
-        state.totalDuration = audio.duration
-        //获取歌曲时间
-        state.musicDuration = audio.currentTime
-
-        //当前歌曲播放完毕自动播放下一首
-        // if (audio.currentTime >= audio.duration) {
-        //   this.changeNextMusic()
-        // }
+        if (state.isChange) return
+        this.commit('getMusicDuration')
       });
-      // 更新音乐播放状态
-      state.isPlay = true
-    }
+    },
+
   },
   actions: {
   },

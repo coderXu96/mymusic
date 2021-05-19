@@ -1,5 +1,11 @@
 @themecolor: #E60026;
 
+// 滚动条宽度
+::-webkit-scrollbar { 
+  width:0px;   /* 滚动条宽度， width：对应竖滚动条的宽度  height：对应横滚动条的高度*/
+  background: @themecolor;
+}
+
 //浅灰色
 .gray {
   color: #C0C4CC;
@@ -17,96 +23,19 @@
   overflow: hidden;
 }
 
-//卡片
-.five-eq {
-  width: 20%;
-}
 
-.row-flex {
-  display: flex;
-  flex-flow: row wrap;
-
-  .el-col {
-    margin-bottom: 20px;
-  }
-
-  .name {
-    margin-top: 5px;
-  }
-
-  .playCount {
-    color: white;
-    position: absolute;
-    top: 5px;
-    right: 20px;
-    overflow: hidden;
-  }
-
-  .playhover {
-    height: 40px;
-    width: 40px;
-    position: absolute;
-    top: 65%;
-    right: 25px;
-  }
-
-  .el-image {
-    border-radius: 4px;
-  }
-}
-
-//标签
-.tag {
-  .tagname {
-    font-size: 0.7rem;
-    color: #909399;
-    flex: 1;
-    display: flex;
-    align-items: top;
-
-    .left {
-      width: 50px;
-    }
-
-    .right {
-      flex: 1;
-      display: flex;
-      flex-wrap: wrap;
-
-      .tagtext {
-        min-width: 77px; //设置最小宽度撑开
-        text-align: center;
-
-        span {
-          padding: 2px 12px;
-          margin: 0px 8px;
-          border-radius: 30px;
-          cursor: pointer;
-        }
-      }
-    }
-
-    .actived,
-    .isActiveByTypes,
-    .isActive,
-    .isActiveByinitial {
-      //被选中的tag标签
-      color: @themecolor;
-      background: rgb(255, 232, 232);
-    }
-  }
-}
 
 // 分页
 .el-pagination {
   text-align: center;
-  margin: 30px 0px 40px 0px;
+  margin: 30px 0px 60px 0px;
 }
 
 .el-pagination.is-background .el-pager li:not(.disabled).active {
   background-color: @themecolor;
   color: #FFF;
 }
+
 
 .el-pagination .el-pager li:not(.disabled):hover {
   color: @themecolor  !important;

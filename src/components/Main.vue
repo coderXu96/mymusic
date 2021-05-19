@@ -61,16 +61,8 @@
       </el-aside>
 
       <!-- 中间主体 -->
-      <el-container style="margin-left: 210px">
-        <el-main>
-          <!--
-                        setMusicUrl:设置当前需要播放的url连接,子路由(DiyRecommend.vue)的banner调用传递url
-                        setSongListInfo:设置当前歌单信息,子路由(MusicListTable.vue)的点击事件传递歌单信息
-                        musicDuration给子组件传递值  子组件prop接收
-                        curId给子组件传值
-                    -->
-          <router-view ref="child"></router-view>
-        </el-main>
+      <el-container>
+        <router-view ref="child"></router-view>
       </el-container>
     </el-container>
 
@@ -136,6 +128,7 @@
           :src="$store.state.musicUrl"
           autoplay
           class="playMusicAudio"
+          @canplay="canplay"
         ></audio>
       </el-row>
     </el-footer>
@@ -144,6 +137,7 @@
 <script>
 //引用搜索页
 import SearchPage from "./findMusic/search/SearchPage";
+
 export default {
   data() {
     return {
@@ -156,13 +150,17 @@ export default {
       music_pause_pic: require("@/assets/images/music_pause_pic.png"),
       volume_pic: require("@/assets/images/volume_pic.png"),
       mute_pic: require("@/assets/images/mute_pic.png"),
-
       //音乐的音量
       volume: 20,
     };
   },
 
   methods: {
+    canplay() {
+      // 获取音乐信息
+      this.$store.commit("getMusicDuration");
+    },
+
     // 播放暂停音乐
     playtoggle() {
       // 判断当前是否有歌
@@ -170,6 +168,7 @@ export default {
         let audio = document.querySelector(".playMusicAudio");
         if (audio.paused) {
           audio.play();
+          this.$store.commit("musicPlaying");
           this.$store.state.isPlay = true;
         } else {
           audio.pause();
@@ -177,9 +176,11 @@ export default {
         }
       } else {
         this.$notify({
-          title: "提醒",
+          title: "提示",
           message: "暂时没有歌曲在播放",
-          type: "warning",
+          position: "bottom-left",
+          offset: 60,
+          type: "error",
         });
       }
     },
@@ -201,7 +202,12 @@ export default {
       if (this.totalDuration === 0) return;
       let audio = document.querySelector(".playMusicAudio");
       audio.currentTime = this.$store.state.musicDuration;
+      // 拖动进度条自动播放
+      audio.play();
+      this.$store.commit("musicPlaying");
     },
+
+    // 改变声音大小
     volumeChange(sum) {
       let audio = document.querySelector(".playMusicAudio");
       audio.volume = sum / 100;
@@ -220,7 +226,22 @@ export default {
 
     // 跳转到音乐播放详情
     toMusicDetailPage() {
-      this.$router.push("/musicDetail/" + this.$store.state.curId);
+      // 判断路径
+      let reg = /musicDetail/gi;
+      if (reg.test(this.$route.path)) {
+        this.$router.go(-1);
+      }
+      if (this.$store.state.musicUrl) {
+        this.$router.push("/musicDetail/" + this.$store.state.curId);
+      } else {
+        this.$notify({
+          title: "提示",
+          message: "暂时没有歌曲在播放",
+          position: "bottom-left",
+          offset: 60,
+          type: "error",
+        });
+      }
     },
   },
 
@@ -244,6 +265,7 @@ export default {
   left: 0px;
   width: 100vw; //不要使用100%,避免出现滚动条时页面晃动
   z-index: 999;
+
   .el-row {
     height: 100%; //一定要设置高度为100%,不然不会居中
     .el-col {
@@ -271,7 +293,12 @@ export default {
       min-height: calc(100vh); //设置最小高度撑满侧边栏
     }
   }
+  .el-container {
+    margin-left: 105px;
+    padding: 10px 30px;
+  }
 }
+
 .el-menu {
   .el-menu-item {
     font-size: 18px;

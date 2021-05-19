@@ -19,6 +19,8 @@ const MusicListPage = () => import("../components/findMusic/musicList/MusicListP
 const djList = () => import("../components/findMusic/djList/djList")
 const MusicRank = () => import("../components/findMusic/rank/MusicRank")
 const SingerListPage = () => import("../components/findMusic/singer/SingerListPage")
+const NewMusic = () => import('../components/findMusic/newMusic/NewMusic')
+
 
 // 搜索
 const SearchPage = () => import('../components/findMusic/search/SearchPage')
@@ -43,17 +45,15 @@ const routes = [
         redirect: '/diyRecommend',
         children: [
           //个性推荐
-          { path: '/diyRecommend', component: DiyRecommend },
+          { path: '/diyRecommend', name: 'diyRecommend', component: DiyRecommend},
           //歌单
-          { path: '/musicListPage', component: MusicListPage },
-          //dj电台
-          { path: '/djList', component: djList },
+          { path: '/musicListPage', name: 'musicListPage', component: MusicListPage },
           //排行榜模块
-          { path: '/musicRank', component: MusicRank },
+          { path: '/musicRank', name: 'musicRank', component: MusicRank },
           //歌手表格模块
-          { path: '/singerList', component: SingerListPage },
-          // //最新音乐模块
-          // {path: '/newMusicList', component: NewMusic},
+          { path: '/singerList', name: 'singerList', component: SingerListPage },
+          //最新音乐模块
+          { path: '/newMusicList', name: 'newMusicList', component: NewMusic },
         ]
       },
 
@@ -61,21 +61,26 @@ const routes = [
       {
         path: '/search/:data',
         component: SearchPage,
+        redirect: '/searchBySong/:data',
         children: [
           {
             path: '/searchBySong/:data',
+            name:'searchBySong',
             component: SearchBySong
           },
           {
             path: '/searchBySinger/:data',
+            name:'searchBySinger',
             component: SearchBySinger
           },
           {
             path: '/searchByVideo/:data',
+            name:'searchByVideo',
             component: SearchByVideo
           },
           {
             path: '/searchByPlayList/:data',
+            name:'searchByPlayList',
             component: SearchByPlayList
           },
         ]
@@ -84,6 +89,7 @@ const routes = [
       //播放详情页
       {
         path: 'musicDetail/:id',
+        name: 'PlayMusicDetailPage',
         component: PlayMusicDetailPage
       },
     ]

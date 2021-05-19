@@ -1,26 +1,19 @@
 <template>
   <el-container :key="this.$route.params.data">
     <el-header>
-      <el-menu
-        :default-active="/searchBySong/ + `${this.$route.params.data}`"
-        :router="true"
-        mode="horizontal"
-      >
-        <el-menu-item
-          :index="/searchBySong/ + `${this.$route.params.data}`"
-          ref="songClick"
-          >单曲</el-menu-item
-        >
-        <el-menu-item :index="/searchBySinger/ + `${this.$route.params.data}`"
-          >歌手</el-menu-item
-        >
-        <el-menu-item>专辑</el-menu-item>
-        <el-menu-item :index="/searchByVideo/ + `${this.$route.params.data}`"
-          >视频</el-menu-item
-        >
-        <el-menu-item :index="/searchByPlayList/ + `${this.$route.params.data}`"
-          >歌单</el-menu-item
-        >
+      <el-menu :default-active="active" :router="true" mode="horizontal">
+        <el-menu-item :index="/searchBySong/ + `${this.$route.params.data}`">
+          单曲
+        </el-menu-item>
+        <el-menu-item :index="/searchBySinger/ + `${this.$route.params.data}`">
+          歌手
+        </el-menu-item>
+        <el-menu-item :index="/searchByVideo/ + `${this.$route.params.data}`">
+          视频
+        </el-menu-item>
+        <el-menu-item :index="/searchByPlayList/ + `${this.$route.params.data}`">
+          歌单
+        </el-menu-item>
         <el-menu-item>歌词</el-menu-item>
         <el-menu-item>主播电台</el-menu-item>
         <el-menu-item>用户</el-menu-item>
@@ -28,7 +21,9 @@
     </el-header>
 
     <el-main>
-      <router-view ref="child" @setMusicUrl="setMusicUrl"></router-view>
+      <keep-alive>
+        <router-view />
+      </keep-alive>
     </el-main>
   </el-container>
 </template>
@@ -37,6 +32,8 @@
 export default {
   data() {
     return {
+      //将当前路由的路径设为选中值,有中文的话需要解码
+      active: decodeURIComponent(this.$route.path),
       //当前搜索的字幕
       searchData: decodeURIComponent(this.$route.params.data),
     };
@@ -44,19 +41,15 @@ export default {
   created() {
     this.toSingSearchPage();
   },
+
   //decodeURIComponent参数解码
   methods: {
     toSingSearchPage() {
       this.searchData = this.$route.params.data;
-
       //如果为自跳转则执行
       this.$router.push(
         "/searchBySong/" + decodeURIComponent(this.$route.params.data)
       );
-    },
-    //调用父类方法
-    setMusicUrl(url, detail) {
-      this.$emit("setMusicUrl", url, detail);
     },
   },
 };
@@ -68,18 +61,23 @@ export default {
   border-bottom: 0; //去除底部细线
   .el-menu-item {
     font-size: 0.9rem;
+    height: 40px;
+    line-height: 40px;
   }
   .is-active {
     font-weight: 900;
     color: black;
-    border-bottom: 0;
+    border-bottom: 2px solid @themecolor !important;
   }
 }
 .el-header {
   position: fixed;
+  left:210px;
   top: 60px;
-  left: 210px;
   width: 100%;
   z-index: 999;
+}
+.el-main {
+  padding: 20px;
 }
 </style>
