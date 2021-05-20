@@ -1,6 +1,5 @@
-
 <template>
-  <div>
+  <div style="margin-left: 120px">
     <el-row
       type="flex"
       justify="center"
@@ -184,7 +183,6 @@
   </div>
 </template>
 
-
 <script>
 export default {
   data() {
@@ -223,7 +221,7 @@ export default {
     //查询该歌曲的评论信息
     this.getMusicComment();
   },
-  
+
   watch: {
     //监听vuex中的进度条变化
     "$store.state.musicDuration"(newVal) {

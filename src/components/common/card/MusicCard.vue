@@ -3,7 +3,7 @@
     <el-col
       v-for="(item, index) in musiclist"
       :key="item+index"
-      class="mark-img five-eq"
+      class="card five-eq"
     >
       <div class="image_cont">
         <el-image :src="item.image" @click="linkto(item.linkurl)" fit='cover' lazy> </el-image>
@@ -50,6 +50,11 @@ export default {
 };
 </script>
 <style lang='less' scoped>
+
+.card{
+  position: relative;
+}
+
 //卡片
 .five-eq {
   width: 20%;
@@ -99,4 +104,5 @@ export default {
     border-radius: 4px;
   }
 }
+
 </style>

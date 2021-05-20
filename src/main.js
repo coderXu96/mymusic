@@ -10,6 +10,7 @@ import '@/assets/css/common.less';
 import axios from 'axios'
 // 设置默认的请求头部url
 axios.defaults.baseURL = '/api';
+
 // 原型链挂载
 Vue.prototype.$http = axios;
 

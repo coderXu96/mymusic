@@ -1,15 +1,16 @@
 <template>
   <el-container style="margin-bottom: 45px">
-    <el-header height="300px;">
-      <!--轮播图-->
-      <el-carousel type="card">
-        <el-carousel-item v-for="(item, index) in bannerinfo" :key="index">
-          <div class="mark-img">
+    <el-header height="200px">
+      <el-carousel type="card" height="200px">
+        <el-carousel-item
+          v-for="(item, index) in bannerinfo"
+          :key="index"
+          height="200px"
+        >
+          <div style="position: relative">
             <el-image
               :src="item.imageUrl"
-              fit="contain"
-              style="border-radius: 4px"
-              @click="changeUrl(item.targetId)"
+              @dblclick="changeUrl(item.targetId)"
             ></el-image>
             <el-tag
               :type="item.typeTitle === '独家' ? 'danger' : 'primary'"
@@ -39,7 +40,7 @@
           style="margin-bottom: 10px"
           class="mark-img"
         >
-          <el-image :src="item.sPicUrl" style="border-radius: 4px"> </el-image>
+          <el-image :src="item.sPicUrl"> </el-image>
           <div class="name">{{ item.name }}</div>
           <span class="playvideo"><i class="el-icon-video-play"></i></span>
         </el-col>
@@ -47,72 +48,26 @@
 
       <!-- 最新音乐 -->
       <p style="margin-bottom: 10px; font-size: 22px">最新音乐</p>
+
       <el-row>
-        <el-col :span="8">
-          <el-table :data="newmusiclist.slice(0, 4)" :show-header="false">
-            <el-table-column>
-              <template scope="scope">
-                <div class="newmusiclist">
-                  <el-image
-                    :src="scope.row.picUrl"
-                    class="newmusic_img"
-                  ></el-image>
-                  <el-image
-                    :src="newmusic_icon"
-                    class="newmusic_icon"
-                  ></el-image>
-                  <div class="newmusic_text">
-                    <div class="name">{{ scope.row.name }}</div>
-                    <div class="song">{{ scope.row.song.artists[0].name }}</div>
-                  </div>
-                </div>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-col>
-        <el-col :span="8">
-          <el-table :data="newmusiclist.slice(4, 8)" :show-header="false">
-            <el-table-column>
-              <template scope="scope">
-                <div class="newmusiclist">
-                  <el-image
-                    :src="scope.row.picUrl"
-                    class="newmusic_img"
-                  ></el-image>
-                  <el-image
-                    :src="newmusic_icon"
-                    class="newmusic_icon"
-                  ></el-image>
-                  <div class="newmusic_text">
-                    <div class="name">{{ scope.row.name }}</div>
-                    <div class="song">{{ scope.row.song.artists[0].name }}</div>
-                  </div>
-                </div>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-col>
-        <el-col :span="8">
-          <el-table :data="newmusiclist.slice(8, 12)" :show-header="false">
-            <el-table-column>
-              <template scope="scope">
-                <div class="newmusiclist">
-                  <el-image
-                    :src="scope.row.picUrl"
-                    class="newmusic_img"
-                  ></el-image>
-                  <el-image
-                    :src="newmusic_icon"
-                    class="newmusic_icon"
-                  ></el-image>
-                  <div class="newmusic_text">
-                    <div class="name">{{ scope.row.name }}</div>
-                    <div class="song">{{ scope.row.song.artists[0].name }}</div>
-                  </div>
-                </div>
-              </template>
-            </el-table-column>
-          </el-table>
+        <el-col
+          :span="8"
+          v-for="(item, index) in newmusiclist"
+          :key="item + index"
+          class="mar_top_20"
+        >
+          <div
+            class="newmusiclist"
+            @dblclick="changeUrl(item.id)"
+            style="cursor: pointer"
+          >
+            <el-image :src="item.picUrl" class="newmusic_img"></el-image>
+            <el-image :src="newmusic_icon" class="newmusic_icon"></el-image>
+            <div class="newmusic_text">
+              <div class="name">{{ item.name }}</div>
+              <div class="song">{{ item.song.artists[0].name }}</div>
+            </div>
+          </div>
         </el-col>
       </el-row>
     </el-main>
@@ -122,6 +77,16 @@
 <script>
 import MusicCard from "../../common/card/MusicCard";
 import { MUSICLIST } from "../../common/card/MusicClass";
+
+// axios
+import {
+  getBannerInfo,
+  getMusicList,
+  getPrivateList,
+  getNewmusicList,
+  getMusicUrl,
+  getMusicDetail,
+} from "../../../networks/networks";
 
 export default {
   components: {
@@ -147,84 +112,81 @@ export default {
   },
   created() {
     //获取轮播图数据
-    this.getbannerinfo();
+    getBannerInfo().then((res) => {
+      if (res.status !== 200) this.$message.error("轮播图数据获取失败");
+      this.bannerinfo = res.data.banners;
+      console.log(this.bannerinfo);
+    });
+
     //获取推荐歌单数据
-    this.getmusiclist();
-    //获取独家放送的数据
-    this.getPrivateList();
+    getMusicList().then((res) => {
+      let temarr = [];
+      for (const item of res.data.playlists) {
+        let linkurl = "/songlist/" + item.id;
+        let tem = new MUSICLIST(
+          item.coverImgUrl,
+          item.name,
+          item.playCount,
+          linkurl
+        );
+        temarr.push(tem);
+      }
+      this.musiclist = temarr;
+    });
+
+    //获取独家放送数据
+    getPrivateList().then((res) => {
+      this.privateList = res.data.result;
+    });
+
     //获取最新音乐的推送信息
-    this.getnewmusiclist();
+    getNewmusicList().then((res) => {
+      this.newmusiclist = res.data.result;
+    });
   },
   methods: {
-    //获取轮播图数据
-    getbannerinfo() {
-      this.$http.get("banner").then((res) => {
-        if (res.status !== 200) this.$message.error("轮播图数据获取失败");
-        this.bannerinfo = res.data.banners;
-      });
-    },
-    //点击banner想父组件传递切换对应的音乐,和专辑封面
-    // https://autumnfish.cn/song/detail?ids=1471057078
-    changeUrl(musicId) {
-      if (musicId === null) return;
-      this.getMusicUrl(musicId);
-      this.getMusicDetail(musicId);
+    // 切换歌曲
+    async changeUrl(musicId) {
+      if (musicId) {
+        console.log("当前音乐:" + musicId);
+        await this.getmusicurl(musicId);
+        await this.getmusicdetail(musicId);
 
-      //防止url未获得提交信息到父组件
-      if (this.musicUrl !== "") {
-        this.$store.commit("playMusic", {
-          murl: this.musicUrl,
-          detail: this.music,
-        });
+        //防止url未获得提交信息到父组件
+        if (this.musicUrl !== "") {
+          this.$store.commit("playMusic", {
+            murl: this.musicUrl,
+            detail: this.music,
+          });
+        } else {
+          this.$notify({
+            title: "警告",
+            message: "歌曲信息未知",
+            type: "warning",
+          });
+        }
       } else {
         this.$notify({
           title: "警告",
-          message: "歌曲信息未知",
+          message: "未能获取到歌曲",
           type: "warning",
         });
+        return
       }
     },
 
-    //根据id获取音乐url
-    getMusicUrl(musicId) {
-      this.$http.get("song/url", { params: { id: musicId } }).then((res) => {
+    // 根据id获取音乐url
+    async getmusicurl(musicId) {
+      await getMusicUrl(musicId).then((res) => {
         this.musicUrl = res.data.data[0].url;
       });
     },
 
     //根据id获取音乐详情
-    getMusicDetail(musicId) {
-      this.$http
-        .get("song/detail", { params: { ids: musicId } })
-        .then((res) => {
-          this.music = res.data.songs[0];
-        });
-    },
-
-    //获取推荐歌单数据
-    getmusiclist() {
-      // 随机取出精品歌单,避免数据是流动的
-      this.$http
-        .get("/top/playlist", {
-          params: {
-            offset: (Math.random() * 1297).toFixed(0) - 10,
-            limit: 10,
-          },
-        })
-        .then((res) => {
-          let temarr = [];
-          for (const item of res.data.playlists) {
-            let linkurl = "/songlist/" + item.id;
-            let tem = new MUSICLIST(
-              item.coverImgUrl,
-              item.name,
-              item.playCount,
-              linkurl
-            );
-            temarr.push(tem);
-          }
-          this.musiclist = temarr;
-        });
+    async getmusicdetail(musicId) {
+      await getMusicDetail(musicId).then((res) => {
+        this.music = res.data.songs[0];
+      });
     },
 
     //点击歌单跳转界面
@@ -232,26 +194,11 @@ export default {
       this.$router.push("/songlist/" + id);
     },
 
-    //获取独家放送数据
-    getPrivateList() {
-      this.$http.get("/personalized/privatecontent").then((res) => {
-        this.privateList = res.data.result;
-      });
-    },
-
     //点击独家放松的图片跳转mv页面
     toVideoPage(mvId) {
       this.$router.push("toVideoPage/" + mvId);
     },
 
-    //推荐最新音乐
-    getnewmusiclist() {
-      this.$http
-        .get("personalized/newsong", { params: { limit: 12 } })
-        .then((res) => {
-          this.newmusiclist = res.data.result;
-        });
-    },
     //双击播放音乐
     dblclickPlayMusic(row) {
       this.changeUrl(row.id);
@@ -265,6 +212,18 @@ export default {
 </script>
 
 <style lang="less" scoped>
+// 角标
+.mark-img {
+  position: relative;
+}
+
+.mark-tag {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  overflow: hidden;
+}
+
 .playvideo {
   font-size: 30px;
   color: white;
@@ -279,7 +238,6 @@ export default {
   .newmusic_img {
     width: 50px;
     height: 50px;
-    border-radius: 4px;
   }
   .newmusic_icon {
     height: 25px;
