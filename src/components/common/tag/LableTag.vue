@@ -50,8 +50,7 @@ export default {
     color: #909399;
     flex: 1;
     display: flex;
-    align-items: top;
-
+    margin-top: 5px;
     .left {
       width: 50px;
     }

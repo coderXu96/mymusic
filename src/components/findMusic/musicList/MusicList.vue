@@ -1,6 +1,6 @@
 <template>
-  <el-container style="margin-bottom: 55px">
-    <el-header class="tag">
+  <el-container>
+    <el-header class="tag" height="20px">
       <lable-tag
         :taglist="hotMusicListTags"
         :title="'分类'"
@@ -10,13 +10,23 @@
     </el-header>
 
     <el-main>
-      <el-row v-show="toggle == 1" type="flex" justify="center">
-        <i class="el-icon-loading" style="font-size: 20px"></i>数据加载中
+      <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
+
+      <loading :show="loading"></loading>
+
+      <el-row :gutter="20" class="row-flex" v-show="!loading">
+        <el-col
+          v-for="(item, index) in goodMusicList"
+          :key="item + index"
+          class="five-eq"
+        >
+          <music-card :list="item"></music-card>
+        </el-col>
       </el-row>
-      <music-card :musiclist="goodMusicList" v-show="toggle == 2"></music-card>
+
       <!--分页-->
       <el-pagination
-        v-show="toggle == 2"
+        v-show="!loading"
         background
         layout="prev, pager, next"
         :page-size="queryInfo.limit"
@@ -35,9 +45,12 @@ import LableTag from "../../common/tag/LableTag.vue";
 
 import { MUSICLIST } from "../../common/card/MusicClass";
 
+// 引入networks
+import { getHotMusicListTags, getGoodMusicList } from "@/networks/networks.js";
+import Loading from "../../common/loading/Loading.vue";
 
 export default {
-  components: { MusicCard, LableTag },
+  components: { MusicCard, LableTag, Loading },
   data() {
     return {
       //精品歌单分类查询条件
@@ -53,21 +66,21 @@ export default {
       //精品歌单的总数
       goodMusicListTotal: 0,
       //用来显示加载数据,默认不显示
-      toggle: 2,
+      loading: false,
       //分页器当前页码
       cur_page: 1,
     };
   },
   created() {
     //获取热门歌单标签信息
-    this.getHotMusicListTags();
+    this.get_hot_musiclist_tags();
     //获取精品歌单
-    this.getGoodMusicList();
+    this.get_good_musiclist();
   },
   methods: {
-    //获取热门歌单标签信息
-    getHotMusicListTags() {
-      this.$http.get("playlist/hot").then((res) => {
+    // 获取热门歌单标签信息
+    get_hot_musiclist_tags() {
+      getHotMusicListTags().then((res) => {
         let temarr = [];
         for (const item of res.data.tags) {
           let tem = {
@@ -83,39 +96,38 @@ export default {
     changetag(id, type) {
       //设置查询条件的标签筛选
       this.queryInfo[type] = id;
+      console.log(this.queryInfo[type]);
       //将查询偏移量变成0,查询完然后将cur_page(当前页码)变成1
       this.queryInfo.offset = 0;
       this.cur_page = 1;
-      this.getGoodMusicList();
+      this.get_good_musiclist();
     },
 
-    //获取精品歌单
-    getGoodMusicList() {
-      this.toggle = 1;
-      this.$http
-        .get("/top/playlist", { params: this.queryInfo })
-        .then((res) => {
-          let temarr = [];
-          for (const item of res.data.playlists) {
-            let linkurl = "/songlist/" + item.id;
-            let tem = new MUSICLIST(
-              item.coverImgUrl,
-              item.name,
-              item.playCount,
-              linkurl
-            );
-            temarr.push(tem);
-          }
-          this.goodMusicList = temarr;
-          this.goodMusicListTotal = res.data.total;
-          this.toggle = 2;
-        });
+    // 获取精品歌单
+    get_good_musiclist() {
+      this.loading = true;
+      getGoodMusicList(this.queryInfo).then((res) => {
+        let temarr = [];
+        for (const item of res.data.playlists) {
+          let linkurl = "/songlist/" + item.id;
+          let tem = new MUSICLIST(
+            item.coverImgUrl,
+            item.name,
+            item.playCount,
+            linkurl
+          );
+          temarr.push(tem);
+        }
+        this.goodMusicList = temarr;
+        this.goodMusicListTotal = res.data.total;
+        this.loading = false;
+      });
     },
 
     //分页插件页数改变
     handleCurrentChange(newPage) {
       this.queryInfo.offset = (newPage - 1) * this.queryInfo.limit;
-      this.getGoodMusicList();
+      this.get_good_musiclist();
     },
 
     //点击歌单跳转界面

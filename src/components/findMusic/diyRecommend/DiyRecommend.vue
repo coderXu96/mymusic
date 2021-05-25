@@ -1,5 +1,6 @@
 <template>
-  <el-container style="margin-bottom: 45px">
+  <el-container>
+    <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
     <el-header height="200px">
       <el-carousel type="card" height="200px">
         <el-carousel-item
@@ -10,7 +11,7 @@
           <div style="position: relative">
             <el-image
               :src="item.imageUrl"
-              @dblclick="changeUrl(item.targetId)"
+              @dblclick="playMusic(item.targetId)"
             ></el-image>
             <el-tag
               :type="item.typeTitle === '独家' ? 'danger' : 'primary'"
@@ -28,7 +29,15 @@
       <!-- 推荐歌单 -->
       <p style="margin-bottom: 10px; font-size: 22px">推荐歌单</p>
 
-      <music-card :musiclist="musiclist" :hover="true"></music-card>
+      <el-row :gutter="20" class="row-flex">
+        <el-col
+          v-for="(item, index) in musiclist"
+          :key="item + index"
+          class="five-eq"
+        >
+          <music-card :list="item" :hover="true"></music-card>
+        </el-col>
+      </el-row>
 
       <!-- 独家放送 -->
       <p style="margin-bottom: 10px; font-size: 22px">独家放送</p>
@@ -49,25 +58,18 @@
       <!-- 最新音乐 -->
       <p style="margin-bottom: 10px; font-size: 22px">最新音乐</p>
 
-      <el-row>
+      <el-row :gutter="20">
         <el-col
           :span="8"
           v-for="(item, index) in newmusiclist"
           :key="item + index"
           class="mar_top_20"
         >
-          <div
-            class="newmusiclist"
-            @dblclick="changeUrl(item.id)"
-            style="cursor: pointer"
-          >
-            <el-image :src="item.picUrl" class="newmusic_img"></el-image>
-            <el-image :src="newmusic_icon" class="newmusic_icon"></el-image>
-            <div class="newmusic_text">
-              <div class="name">{{ item.name }}</div>
-              <div class="song">{{ item.song.artists[0].name }}</div>
-            </div>
-          </div>
+          <new-music
+            :list="item"
+            class="newmusiccont"
+            @dblclick="playMusic"
+          ></new-music>
         </el-col>
       </el-row>
     </el-main>
@@ -75,31 +77,33 @@
 </template>
 
 <script>
-import MusicCard from "../../common/card/MusicCard";
-import { MUSICLIST } from "../../common/card/MusicClass";
+import MusicCard from "../../common/card/MusicCard.vue";
+import NewMusic from "../../common/table/NewMusic.vue";
 
-// axios
+import { MUSICLIST } from "../../common/card/MusicClass";
+import { NEWMUSIC } from "../../common/table/NewMusic";
+
+// 引入networks
 import {
   getBannerInfo,
   getMusicList,
   getPrivateList,
   getNewmusicList,
-  getMusicUrl,
-  getMusicDetail,
-} from "../../../networks/networks";
+} from "@/networks/networks.js";
+
+// 引入mixin
+import { mixPlayMusic } from "../../common/mixin/mixin.js";
 
 export default {
+  mixins: [mixPlayMusic],
   components: {
     MusicCard,
+    NewMusic,
   },
   data() {
     return {
       //轮播图数据列表
       bannerinfo: [],
-      //需要播放的音乐地址
-      musicUrl: "",
-      //当前音乐的详情对象
-      music: {},
       //推荐歌单的数据
       musiclist: [],
       //独家放送的信息
@@ -115,7 +119,6 @@ export default {
     getBannerInfo().then((res) => {
       if (res.status !== 200) this.$message.error("轮播图数据获取失败");
       this.bannerinfo = res.data.banners;
-      console.log(this.bannerinfo);
     });
 
     //获取推荐歌单数据
@@ -141,54 +144,21 @@ export default {
 
     //获取最新音乐的推送信息
     getNewmusicList().then((res) => {
-      this.newmusiclist = res.data.result;
+      let temarr = [];
+      for (const item of res.data.result) {
+        let tem = new NEWMUSIC(
+          item.id,
+          item.picUrl,
+          item.name,
+          item.song.alias[0],
+          item.song.artists[0].name
+        );
+        temarr.push(tem);
+      }
+      this.newmusiclist = temarr;
     });
   },
   methods: {
-    // 切换歌曲
-    async changeUrl(musicId) {
-      if (musicId) {
-        console.log("当前音乐:" + musicId);
-        await this.getmusicurl(musicId);
-        await this.getmusicdetail(musicId);
-
-        //防止url未获得提交信息到父组件
-        if (this.musicUrl !== "") {
-          this.$store.commit("playMusic", {
-            murl: this.musicUrl,
-            detail: this.music,
-          });
-        } else {
-          this.$notify({
-            title: "警告",
-            message: "歌曲信息未知",
-            type: "warning",
-          });
-        }
-      } else {
-        this.$notify({
-          title: "警告",
-          message: "未能获取到歌曲",
-          type: "warning",
-        });
-        return
-      }
-    },
-
-    // 根据id获取音乐url
-    async getmusicurl(musicId) {
-      await getMusicUrl(musicId).then((res) => {
-        this.musicUrl = res.data.data[0].url;
-      });
-    },
-
-    //根据id获取音乐详情
-    async getmusicdetail(musicId) {
-      await getMusicDetail(musicId).then((res) => {
-        this.music = res.data.songs[0];
-      });
-    },
-
     //点击歌单跳转界面
     toSongListPage(id) {
       this.$router.push("/songlist/" + id);
@@ -199,10 +169,6 @@ export default {
       this.$router.push("toVideoPage/" + mvId);
     },
 
-    //双击播放音乐
-    dblclickPlayMusic(row) {
-      this.changeUrl(row.id);
-    },
     //点击歌手名跳转歌手详细页面
     toSingerPage(row) {
       this.$router.push("/singer/" + row.song.artists[0].id);
@@ -231,28 +197,9 @@ export default {
   top: 4px;
   left: 20px;
 }
-.newmusiclist {
-  position: relative;
-  display: flex;
-  align-items: center;
-  .newmusic_img {
-    width: 50px;
-    height: 50px;
-  }
-  .newmusic_icon {
-    height: 25px;
-    width: 25px;
-    position: absolute;
-    top: 12.5px;
-    left: 12.5px;
-    background: rgba(255, 255, 255, 0.712);
-    border-radius: 50%;
-  }
-  .newmusic_text {
-    margin-left: 7px;
-    .song {
-      color: #909399;
-    }
-  }
+
+.newmusiccont:hover {
+  background-color: rgb(234, 234, 234);
+  border-radius: 5px;
 }
 </style>

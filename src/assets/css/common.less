@@ -9,9 +9,20 @@
 .el-image{
   border-radius: 4px;
 }
+
+// el-row 布局
+.row-flex {
+  display: flex;
+  flex-flow: row wrap;
+}
+.five-eq {
+  width: 20%;
+}
+
 // 滚动条宽度
 ::-webkit-scrollbar { 
   width:0px;   /* 滚动条宽度， width：对应竖滚动条的宽度  height：对应横滚动条的高度*/
+  height: 0px;
   background: @themecolor;
 }
 
@@ -23,14 +34,13 @@
 // 分页
 .el-pagination {
   text-align: center;
-  margin: 30px 0px 60px 0px;
+  margin-top: 30px;
 }
 
 .el-pagination.is-background .el-pager li:not(.disabled).active {
   background-color: @themecolor;
-  color: #FFF;
+  color: #FFF !important;
 }
-
 
 .el-pagination .el-pager li:not(.disabled):hover {
   color: @themecolor  !important;

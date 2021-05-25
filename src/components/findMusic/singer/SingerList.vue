@@ -4,7 +4,7 @@
       <lable-tag
         :taglist="areaList"
         title="语种"
-        type="'area'"
+        type="area"
         @changetag="changetag"
       ></lable-tag>
 
@@ -24,14 +24,24 @@
     </el-header>
 
     <el-main>
-      <el-row v-show="toggle == 1" type="flex" justify="center">
-        <i class="el-icon-loading" style="font-size: 20px"></i>数据加载中
+      <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
+
+      <loading :show="loading"></loading>
+
+      <el-row :gutter="20" class="row-flex" v-show="!loading">
+        <el-col
+          v-for="(item, index) in singerList"
+          :key="item + index"
+          class="five-eq"
+        >
+          <music-card :list="item"></music-card>
+        </el-col>
       </el-row>
-      <music-card :musiclist="singerList" v-show="toggle == 2"></music-card>
+
       <!--分页-->
       <el-pagination
         class="pagination"
-        v-show="toggle == 2"
+        v-show="!loading"
         background
         layout="prev, next"
         :page-size="queryInfo.limit"
@@ -47,9 +57,10 @@ import MusicCard from "../../common/card/MusicCard.vue";
 import LableTag from "../../common/tag/LableTag.vue";
 
 import { MUSICLIST } from "../../common/card/MusicClass";
+import Loading from "../../common/loading/Loading.vue";
 
 export default {
-  components: { MusicCard, LableTag },
+  components: { MusicCard, LableTag ,Loading},
   data() {
     return {
       // 歌手列表
@@ -111,7 +122,7 @@ export default {
         { id: 0, name: "#" },
       ],
       //用来显示加载数据,默认不显示
-      toggle: 2,
+      loading: false,
     };
   },
   created() {
@@ -130,7 +141,7 @@ export default {
 
     //获取歌手数据
     getSingerList() {
-      this.toggle = 1;
+      this.loading = true;
       this.$http.get("artist/list", { params: this.queryInfo }).then((res) => {
         let temarr = [];
         for (const item of res.data.artists) {
@@ -139,7 +150,7 @@ export default {
           temarr.push(tem);
         }
         this.singerList = temarr;
-        this.toggle = 2;
+        this.loading = false;
       });
     },
 

@@ -35,6 +35,52 @@ export function getMusicUrl(musicId) {
 }
 
 // 根据id获取音乐详情
-export function getMusicDetail(musicId){
+export function getMusicDetail(musicId) {
   return axios.get("song/detail", { params: { ids: musicId } })
 }
+
+// 获取歌词
+export function getMusicLrc(id) {
+  return axios.get("lyric", { params: { id: id } })
+}
+
+// 获取最新音乐
+export function getNewMusic(queryInfo) {
+  return axios.get("top/song", { params: queryInfo })
+}
+
+// 获取热门歌单标签信息
+export function getHotMusicListTags() {
+  return axios.get("playlist/hot")
+}
+
+// 获取精品歌单
+export function getGoodMusicList(queryInfo) {
+  return axios.get("/top/playlist", { params: queryInfo })
+}
+
+// 获取官方榜单的数据
+export function getOfficialRankList() {
+  return axios.get("toplist/detail")
+}
+
+// 获取歌曲评论
+export function getMusicComment(queryInfo) {
+  return axios.get("comment/music", { params: queryInfo })
+}
+
+// 获取歌单信息
+export function getSongListInfo(currentId) {
+  return axios.get("playlist/detail", { params: { id: currentId } })
+}
+
+// 获取歌单评论
+export function getCommentList(queryInfo) {
+  return axios.get("comment/playlist", { params: queryInfo })
+}
+
+// 搜索单曲
+export function getSearchResult(queryInfo) {
+  return axios.get("/search", { params: queryInfo })
+}
+

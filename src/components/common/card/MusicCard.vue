@@ -1,34 +1,34 @@
 <template>
-  <el-row :gutter="20" class="row-flex">
-    <el-col
-      v-for="(item, index) in musiclist"
-      :key="item+index"
-      class="card five-eq"
-    >
-      <div class="image_cont">
-        <el-image :src="item.image" @click="linkto(item.linkurl)" fit='cover' lazy> </el-image>
-        <!-- 悬停播放按钮 -->
-        <el-image :src="playhover" class="playhover" v-if="hover"></el-image>
-      </div>
+  <div class="card">
+    <div class="image_cont">
+      <el-image
+        :src="list.image"
+        @click="linkto(list.linkurl)"
+        fit="cover"
+        lazy
+      >
+      </el-image>
+      <!-- 悬停播放按钮 -->
+      <el-image :src="playhover" class="playhover" v-if="hover"></el-image>
+    </div>
 
-      <p @click="linkto(item.linkurl)">{{ item.name }}</p>
-      <span class="playCount" v-if="item.playCount">
-        <i class="el-icon-caret-right"></i>
-        {{
-          item.playCount >= 10000
-            ? (item.playCount / 10000).toFixed(0) + "万"
-            : item.playCount
-        }}
-      </span>
-    </el-col>
-  </el-row>
+    <p @click="linkto(list.linkurl)">{{ list.name }}</p>
+    <span class="playCount" v-if="list.playCount">
+      <i class="el-icon-caret-right"></i>
+      {{
+        list.playCount >= 10000
+          ? (list.playCount / 10000).toFixed(0) + "万"
+          : list.playCount
+      }}
+    </span>
+  </div>
 </template>
 
 <script>
 export default {
   props: {
-    musiclist: {
-      type: Array,
+    list: {
+      type: Object,
       default: [],
     },
     hover: {
@@ -45,25 +45,15 @@ export default {
   methods: {
     linkto(linkurl) {
       console.log(linkurl);
+      this.$router.push(linkurl)
     },
   },
 };
 </script>
 <style lang='less' scoped>
 
-.card{
+.card {
   position: relative;
-}
-
-//卡片
-.five-eq {
-  width: 20%;
-}
-
-.row-flex {
-  display: flex;
-  flex-flow: row wrap;
-
   .image_cont {
     position: relative;
   }
@@ -102,7 +92,7 @@ export default {
   }
   .el-image {
     border-radius: 4px;
+    cursor: pointer;
   }
 }
-
 </style>

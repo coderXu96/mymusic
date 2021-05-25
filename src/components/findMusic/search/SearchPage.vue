@@ -1,7 +1,13 @@
 <template>
   <el-container :key="this.$route.params.data">
+
     <el-header>
-      <el-menu :default-active="active" :router="true" mode="horizontal">
+      <el-menu
+        :default-active="active"
+        :router="true"
+        mode="horizontal"
+        class="header_menu"
+      >
         <el-menu-item :index="/searchBySong/ + `${this.$route.params.data}`">
           单曲
         </el-menu-item>
@@ -11,7 +17,9 @@
         <el-menu-item :index="/searchByVideo/ + `${this.$route.params.data}`">
           视频
         </el-menu-item>
-        <el-menu-item :index="/searchByPlayList/ + `${this.$route.params.data}`">
+        <el-menu-item
+          :index="/searchByPlayList/ + `${this.$route.params.data}`"
+        >
           歌单
         </el-menu-item>
         <el-menu-item>歌词</el-menu-item>
@@ -25,6 +33,7 @@
         <router-view />
       </keep-alive>
     </el-main>
+
   </el-container>
 </template>
 
@@ -56,13 +65,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@themecolor: #E60026;
-.el-menu.el-menu--horizontal {
-  border-bottom: 0; //去除底部细线
+@themecolor: #e60026;
+.header_menu {
   .el-menu-item {
-    font-size: 0.9rem;
-    height: 40px;
-    line-height: 40px;
+    font-size: 1.1rem;
   }
   .is-active {
     font-weight: 900;
@@ -72,12 +78,14 @@ export default {
 }
 .el-header {
   position: fixed;
-  left:210px;
   top: 60px;
+  left: 210px;
   width: 100%;
   z-index: 999;
+  padding: 0px;
 }
 .el-main {
-  padding: 20px;
+  padding: 0px;
+  padding-top: 30px;
 }
 </style>

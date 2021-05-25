@@ -1,8 +1,8 @@
 <template>
   <div>
     <!--最新音乐-->
-    <el-row style="margin-top: 25px">
-      <el-header class="tag">
+    <el-row>
+      <el-header class="tag" height="30px">
         <lable-tag
           :taglist="musicType"
           :title="'语种'"
@@ -12,35 +12,38 @@
       </el-header>
     </el-row>
 
-    <el-row v-show="toggle == 1" type="flex" justify="center">
-      <i class="el-icon-loading" style="font-size: 20px"></i>数据加载中
-    </el-row>
-    <div class="muscilist" v-show="toggle == 2">
+    <loading :show='loading'></loading>
+
+    <div class="muscilist" v-show="!loading">
+      <el-backtop :bottom='80' :visibility-height='400'></el-backtop>
       <el-row
         v-for="(item, index) in newMusicInfo"
         :key="item.index"
         :style="index % 2 === 0 ? 'background: rgb(245,245,247)' : ''"
       >
         <el-col :span="24">
-          <el-image
-            :src="item.album.picUrl"
-            @dblclick="playMusic(item.id)"
-            lazy
-          ></el-image>
-          <span>{{ item.name }}</span
-          ><br />
-          <span> {{ item.album.name }}</span>
+          <new-music :list="item" @dblclick="playMusic"></new-music>
         </el-col>
       </el-row>
     </div>
+
   </div>
 </template>
 
 <script>
+import NewMusic from "../../common/table/NewMusic.vue";
 import LableTag from "../../common/tag/LableTag.vue";
 
+import { NEWMUSIC } from "../../common/table/NewMusic.js";
+import { getNewMusic } from "../../../networks/networks.js";
+
+// 引入mixin
+import {mixPlayMusic} from '../../common/mixin/mixin.js'
+import Loading from '../../common/loading/Loading.vue';
+
 export default {
-  components: { LableTag },
+  mixins:[mixPlayMusic],
+  components: { LableTag, NewMusic, Loading },
   data() {
     return {
       //筛选条件
@@ -56,68 +59,48 @@ export default {
         { id: 8, name: "日本" },
       ],
       //最新音乐的数据
-      newMusicInfo: [
-        {
-          id: 0,
-          album: {
-            picUrl: "",
-          },
-        },
-      ],
-      toggle: 2,
+      newMusicInfo: [],
+      loading:false
     };
   },
   created() {
-    //获取最新音乐
-    this.getNewMusic();
+    // 获取最新音乐
+    this.get_new_music();
   },
   methods: {
+    get_new_music() {
+      this.loading = true
+      getNewMusic(this.queryInfo).then((res) => {
+        let temarr = [];
+        for (const item of res.data.data) {
+          let tem = new NEWMUSIC(
+            item.id,
+            item.album.picUrl,
+            item.name,
+            item.alias[0],
+            item.artists[0].name
+          );
+          temarr.push(tem);
+        }
+        this.newMusicInfo = temarr;
+        this.loading = false
+      });
+    },
+
+    // 切换标签
     changetag(id, type) {
       // 修改查询条件
       this.queryInfo[type] = id;
       // 将查询偏移量变成0
       this.queryInfo.offset = 0;
-      this.getNewMusic();
-    },
-    getNewMusic() {
-      this.toggle = 1;
-      this.$http.get("top/song", { params: this.queryInfo }).then((res) => {
-        this.newMusicInfo = res.data.data;
-        this.toggle = 2;
-      });
-    },
-    //播放点击的最新音乐
-    changeNewUrl(musicId) {
-      var playlist = [];
-      this.newMusicInfo.forEach((item) => {
-        playlist.push(item.id);
-      });
-      this.$emit("setSongListInfo", playlist, musicId);
-      this.playMusic(musicId);
-    },
-
-    playMusic(musicId) {
-      console.log(musicId);
-      this.$http.get("song/url", { params: { id: musicId } }).then((res) => {
-        if (res.data.data[0].url !== "") {
-          this.$http
-            .get("song/detail", { params: { ids: musicId } })
-            .then((r) => {
-              // this.$emit("setMusicUrl", res.data.data[0].url, r.data.songs[0]);
-              this.$store.commit("playMusic", {
-                murl: res.data.data[0].url,
-                detail: r.data.songs[0],
-              });
-            });
-        }
-      });
+      // 查询
+      this.get_new_music();
     },
   },
 };
 </script>
 <style lang="less" scoped>
 .muscilist {
-  margin-bottom: 75px;
   .el-row {
     padding: 10px 0px;
     .el-col {

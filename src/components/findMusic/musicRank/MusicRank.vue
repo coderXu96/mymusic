@@ -3,6 +3,7 @@
     <!-- 官方榜 -->
     <el-header height="auto" class="title">官方榜</el-header>
     <el-main>
+      <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
       <el-row
         :gutter="20"
         class="RankList"
@@ -26,7 +27,9 @@
                 }}</span>
               </template>
             </el-table-column>
+
             <el-table-column prop="first"></el-table-column>
+
             <el-table-column
               prop="second"
               align="right"
@@ -68,7 +71,15 @@
     <!-- 全球榜 -->
     <el-header height="auto" class="title">全球榜</el-header>
     <el-main>
-      <music-card :musiclist="globa"></music-card>
+      <el-row :gutter="20" class="row-flex">
+        <el-col
+          v-for="(item, index) in globa"
+          :key="item + index"
+          class="five-eq"
+        >
+          <music-card :list="item"></music-card>
+        </el-col>
+      </el-row>
     </el-main>
   </el-container>
 </template>
@@ -76,6 +87,8 @@
 <script>
 import MusicCard from "../../common/card/MusicCard.vue";
 import { MUSICLIST } from "../../common/card/MusicClass";
+
+import { getOfficialRankList } from "@/networks/networks.js";
 
 export default {
   components: { MusicCard },
@@ -125,23 +138,24 @@ export default {
   },
   created() {
     //获取官方榜单的数据
-    this.getOfficialRankList();
+    this.get_official_ranklist();
   },
   mounted() {
     console.log(this);
   },
   methods: {
-    //获得官方榜单的数据
-    getOfficialRankList() {
-      this.$http.get("toplist/detail").then((res) => {
+    get_official_ranklist() {
+      getOfficialRankList().then((res) => {
         this.musicRankList = res.data.list;
         this.singerRankInfo = res.data.artistToplist;
       });
     },
+
     //点击歌单跳转界面
     toSongListPage(id) {
       this.$router.push("/songlist/" + id);
     },
+
     //双击歌曲添加数据进去,并循环播放(向父组件传递参数)
     playMusicList(row) {
       this.$emit(

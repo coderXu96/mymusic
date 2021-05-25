@@ -1,11 +1,24 @@
 <template>
-  <el-container class="v-music">
+  <el-container>
     <!-- 头部 -->
-    <el-header>
+    <el-header class="header">
       <el-row type="flex" justify="space-between" align="middle">
-        <el-col :span="4">
+        <el-col :span="5">
           <el-image :src="logo_pic" class="logo_pic"> </el-image>
           V-Music
+          <el-button
+            style="margin-left: 20px"
+            icon="el-icon-back"
+            size="mini"
+            circle
+            @click="$router.go(-1)"
+          ></el-button>
+          <el-button
+            icon="el-icon-right"
+            size="mini"
+            circle
+            @click="$router.go(1)"
+          ></el-button>
         </el-col>
         <el-col :span="12">
           <el-input
@@ -15,7 +28,7 @@
             @change="toSearchPage"
           ></el-input>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="3">
           <el-image :src="user_pic" class="logo_pic"> </el-image>
           未登录
         </el-col>
@@ -23,51 +36,16 @@
     </el-header>
 
     <!-- 中间 -->
-
-    <el-container class="container">
-      <!-- 侧边栏 -->
-      <el-aside>
-        <el-menu
-          text-color="#303133"
-          :router="true"
-          default-active="/findMusic"
-          style="font-size: 30px"
-        >
-          <el-menu-item-group>
-            <el-menu-item index="/findMusic">发现音乐</el-menu-item>
-            <el-menu-item index="">视频</el-menu-item>
-            <el-menu-item index="">朋友</el-menu-item>
-            <el-menu-item index="">直播</el-menu-item>
-            <el-menu-item index="">私人FM</el-menu-item>
-          </el-menu-item-group>
-
-          <el-menu-item-group>
-            <template slot="title">我的音乐</template>
-            <el-menu-item index="">
-              <i class="el-icon-headset"> 本地音乐</i>
-            </el-menu-item>
-            <el-menu-item index="">
-              <i class="el-icon-download"> 下载管理</i>
-            </el-menu-item>
-          </el-menu-item-group>
-
-          <el-menu-item-group>
-            <template slot="title">创建的歌单</template>
-            <el-menu-item index="">
-              <i class="el-icon-star-off"> 我喜欢的音乐</i>
-            </el-menu-item>
-          </el-menu-item-group>
-        </el-menu>
-      </el-aside>
-
-      <!-- 中间主体 -->
-      <el-container>
-        <router-view ref="child"></router-view>
-      </el-container>
-    </el-container>
+    <el-main class="main">
+      <transition name="el-fade-in-linear" duration="400">
+        <keep-alive exclude="musicDetail">
+          <router-view ref="child"></router-view>
+        </keep-alive>
+      </transition>
+    </el-main>
 
     <!-- 尾部 -->
-    <el-footer height="70px">
+    <el-footer height="70px" class="footer">
       <el-row type="flex" justify="space-between" align="middle">
         <el-col :span="6">
           <el-image
@@ -104,9 +82,9 @@
                 :max="$store.state.totalDuration"
                 @change="musicDurationChange"
                 :show-tooltip="false"
-                style="width: 100%; margin: 0px 20px"
+                style="width: 100%; padding: 0 10px"
               ></el-slider>
-              {{ $store.state.totalDuration | timeFormat }}
+              {{ $store.state.totalDuration || "" | timeFormat }}
             </div>
           </div>
         </el-col>
@@ -126,9 +104,9 @@
         </el-col>
         <audio
           :src="$store.state.musicUrl"
-          autoplay
           class="playMusicAudio"
           @canplay="canplay"
+          @ended="ended"
         ></audio>
       </el-row>
     </el-footer>
@@ -154,7 +132,7 @@ export default {
       volume: 20,
     };
   },
-
+  
   methods: {
     canplay() {
       // 获取音乐信息
@@ -197,13 +175,13 @@ export default {
       }
     },
 
-    //音乐进度条值变化的方法
+    // 音乐进度条值变化的方法
     musicDurationChange() {
       if (this.totalDuration === 0) return;
       let audio = document.querySelector(".playMusicAudio");
       audio.currentTime = this.$store.state.musicDuration;
       // 拖动进度条自动播放
-      audio.play();
+      // audio.play();
       this.$store.commit("musicPlaying");
     },
 
@@ -214,7 +192,7 @@ export default {
       this.volume = sum;
     },
 
-    //搜索
+    // 搜索
     toSearchPage() {
       if (this.searchData.trim() !== "") {
         //encodeURIComponent参数转换 应对中文参数
@@ -237,11 +215,14 @@ export default {
         this.$notify({
           title: "提示",
           message: "暂时没有歌曲在播放",
-          position: "bottom-left",
-          offset: 60,
           type: "error",
         });
       }
+    },
+
+    // 播放完毕
+    ended() {
+      this.$store.commit("musicEnded");
     },
   },
 
@@ -253,11 +234,14 @@ export default {
 
 <style lang="less" scoped>
 //头部高度为60px,底部高度为80px z-idnex为999
-@themecolor: #E60026;
-.v-music {
-  overflow-x: hidden; //隐藏横向滚动条
+@themecolor: #e60026;
+
+// 中间主体
+.main {
+  margin: 60px 0px 70px 0px;
 }
-.el-header {
+
+.header {
   background: @themecolor;
   color: white;
   position: fixed;
@@ -280,24 +264,6 @@ export default {
     }
   }
 }
-.container {
-  margin-top: 60px;
-  width: 100vw;
-  .el-aside {
-    position: fixed;
-    top: 60px;
-    left: 0px;
-    width: 210px !important;
-    z-index: 888;
-    .el-menu {
-      min-height: calc(100vh); //设置最小高度撑满侧边栏
-    }
-  }
-  .el-container {
-    margin-left: 105px;
-    padding: 10px 30px;
-  }
-}
 
 .el-menu {
   .el-menu-item {
@@ -308,7 +274,8 @@ export default {
     color: black;
   }
 }
-.el-footer {
+
+.footer {
   width: 100%;
   //定位在底部
   position: fixed;
