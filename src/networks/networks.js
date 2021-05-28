@@ -79,8 +79,28 @@ export function getCommentList(queryInfo) {
   return axios.get("comment/playlist", { params: queryInfo })
 }
 
-// 搜索单曲
+// 搜索
 export function getSearchResult(queryInfo) {
   return axios.get("/search", { params: queryInfo })
+}
+
+//获取当前mv的详细数据
+export function getMvDetailInfo(curMvId) {
+  return axios.get("/mv/detail", { params: { mvid: curMvId } })
+}
+
+//获取当前mv的url
+export function getMvUrl(curMvId) {
+  return axios.get("mv/url", { params: { id: curMvId } })
+}
+
+//获取相关的mv
+export function getSimiMvs(curMvId) {
+  return axios.get("simi/mv", { params: { mvid: curMvId } })
+}
+
+// 获取mv评论
+export function getMvCommentList(queryInfo) {
+  return axios.get("comment/mv", { params: queryInfo })
 }
 

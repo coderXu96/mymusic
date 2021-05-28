@@ -1,18 +1,17 @@
 <template>
   <div class="card">
     <div class="image_cont">
-      <el-image
+      <img
+        class="image"
         :src="list.image"
         @click="linkto(list.linkurl)"
-        fit="cover"
         lazy
       >
-      </el-image>
       <!-- 悬停播放按钮 -->
       <el-image :src="playhover" class="playhover" v-if="hover"></el-image>
     </div>
 
-    <p @click="linkto(list.linkurl)">{{ list.name }}</p>
+    <div @click="linkto(list.linkurl)" class="name">{{ list.name }}</div>
     <span class="playCount" v-if="list.playCount">
       <i class="el-icon-caret-right"></i>
       {{
@@ -26,10 +25,13 @@
 
 <script>
 export default {
+  name: "musicCard",
   props: {
     list: {
       type: Object,
-      default: [],
+      default: () => {
+        return {};
+      },
     },
     hover: {
       type: Boolean,
@@ -44,16 +46,21 @@ export default {
   },
   methods: {
     linkto(linkurl) {
-      console.log(linkurl);
-      this.$router.push(linkurl)
+      this.$router.push(linkurl);
     },
   },
 };
 </script>
 <style lang='less' scoped>
-
 .card {
   position: relative;
+  margin-bottom: 15px;
+  .image{
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    cursor: pointer;
+  }
   .image_cont {
     position: relative;
   }
@@ -72,14 +79,14 @@ export default {
   }
 
   .name {
-    margin-top: 5px;
+    margin-top:7px;
   }
 
   .playCount {
     color: white;
     position: absolute;
     top: 5px;
-    right: 20px;
+    right: 10px;
     overflow: hidden;
   }
 
@@ -88,11 +95,7 @@ export default {
     height: 40px;
     width: 40px;
     bottom: 20px;
-    right: 15px;
-  }
-  .el-image {
-    border-radius: 4px;
-    cursor: pointer;
+    right: 10px;
   }
 }
 </style>

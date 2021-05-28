@@ -33,7 +33,7 @@
     <!-- 中间主体 -->
     <el-container class="center">
       <el-main>
-        <keep-alive>
+        <keep-alive exclude="searchPage">
           <router-view ref="child"></router-view>
         </keep-alive>
       </el-main>

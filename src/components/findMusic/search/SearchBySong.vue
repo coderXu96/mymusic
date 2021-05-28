@@ -30,13 +30,13 @@ import { getSearchResult } from "@/networks/networks.js";
 import Loading from "../../common/loading/Loading.vue";
 
 export default {
+  name: 'searchBySong',
   components: { MusicInfo, Loading },
   data() {
     return {
-      searchData: decodeURIComponent(this.$route.params.data),
       //当前的搜索条件
       queryInfo: {
-        keywords: this.$route.params.data,
+        keywords: decodeURIComponent(this.$route.params.data),
         limit: 100,
         offset: 0,
         type: 1,
@@ -45,25 +45,26 @@ export default {
       songTotal: 0,
       //歌曲数的结果集
       songList: [],
-      //父组件当前播放的音乐的id
-      curId: parseInt(window.localStorage.getItem("curPlayMusicId")),
       //用来显示加载数据,默认不显示
       loading: false,
       //分页器当前页码
       cur_page: 1,
     };
   },
-  activated() {
-    console.log("我处于活跃");
+
+  // 监听搜索变化
+  watch:{
+    "$store.state.search"(newVal){
+      this.queryInfo.keywords = newVal
+      this.get_search_result();
+    }
   },
+
   created() {
     //获取搜索结果集
     this.get_search_result();
-    //注册监听的事件 在main.js中定义了
-    window.addEventListener("setItem", () => {
-      this.curId = parseInt(localStorage.getItem("curPlayMusicId"));
-    });
   },
+
   methods: {
     get_search_result() {
       this.loading = true;

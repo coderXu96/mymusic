@@ -100,6 +100,12 @@ export const mixComment = {
       cur_page: 1,
     };
   },
+  // keep-alive 页面也做处理
+  activated() {
+    //获取评论列表
+    this.get_Comment();
+  },
+
   created() {
     //获取评论列表
     this.get_Comment();
@@ -108,6 +114,7 @@ export const mixComment = {
   methods: {
     // 分页插件页数改变
     handleCurrentChange(newPage) {
+      window.scrollTo(0, 400,'smooth');
       this.queryInfo.offset = (newPage - 1) * this.queryInfo.limit;
       this.get_Comment();
     },

@@ -140,9 +140,6 @@ export default {
     //获取官方榜单的数据
     this.get_official_ranklist();
   },
-  mounted() {
-    console.log(this);
-  },
   methods: {
     get_official_ranklist() {
       getOfficialRankList().then((res) => {
@@ -150,7 +147,7 @@ export default {
         this.singerRankInfo = res.data.artistToplist;
       });
     },
-
+    
     //点击歌单跳转界面
     toSongListPage(id) {
       this.$router.push("/songlist/" + id);

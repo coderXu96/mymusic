@@ -4,9 +4,11 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
-    //播放音乐的链接
+    // 搜索内容
+    search: '',
+    // 播放音乐的链接
     musicUrl: '',
-    //当前音乐详情对象
+    // 当前音乐详情对象
     music: {
       name: '',
       al: {
@@ -16,18 +18,23 @@ export default new Vuex.Store({
         name: ''
       }]
     },
-    //当前音乐的进度条
+    // 当前音乐的进度条
     musicDuration: 0,
-    //当前音乐的id
+    // 当前音乐的id
     curId: 0,
-    //总进度条
+    // 总进度条
     totalDuration: 0,
-    //默认是否在播放
+    // 默认是否在播放
     isPlay: false,
-    //判断是否被拖动
+    // 判断是否被拖动
     isChange: false
   },
   mutations: {
+    // 修改搜索内容
+    changeSearch(state,payload){
+      state.search = payload.search
+    },
+
     // 播放音乐
     playMusic(state, payload) {
       this.commit('setMusic', payload)

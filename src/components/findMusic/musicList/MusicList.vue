@@ -20,7 +20,7 @@
           :key="item + index"
           class="five-eq"
         >
-          <music-card :list="item"></music-card>
+          <music-card :list="item" :hover="true"></music-card>
         </el-col>
       </el-row>
 

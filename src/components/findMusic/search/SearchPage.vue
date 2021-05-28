@@ -1,6 +1,5 @@
 <template>
-  <el-container :key="this.$route.params.data">
-
+  <el-container>
     <el-header>
       <el-menu
         :default-active="active"
@@ -8,20 +7,10 @@
         mode="horizontal"
         class="header_menu"
       >
-        <el-menu-item :index="/searchBySong/ + `${this.$route.params.data}`">
-          单曲
-        </el-menu-item>
-        <el-menu-item :index="/searchBySinger/ + `${this.$route.params.data}`">
-          歌手
-        </el-menu-item>
-        <el-menu-item :index="/searchByVideo/ + `${this.$route.params.data}`">
-          视频
-        </el-menu-item>
-        <el-menu-item
-          :index="/searchByPlayList/ + `${this.$route.params.data}`"
-        >
-          歌单
-        </el-menu-item>
+        <el-menu-item :index="searchBySong"> 单曲 </el-menu-item>
+        <el-menu-item :index="searchBySinger"> 歌手 </el-menu-item>
+        <el-menu-item :index="searchByVideo"> 视频 </el-menu-item>
+        <el-menu-item :index="searchByPlayList"> 歌单 </el-menu-item>
         <el-menu-item>歌词</el-menu-item>
         <el-menu-item>主播电台</el-menu-item>
         <el-menu-item>用户</el-menu-item>
@@ -33,32 +22,30 @@
         <router-view />
       </keep-alive>
     </el-main>
-
   </el-container>
 </template>
 
 <script>
 export default {
+  name: "searchPage",
   data() {
     return {
       //将当前路由的路径设为选中值,有中文的话需要解码
       active: decodeURIComponent(this.$route.path),
-      //当前搜索的字幕
-      searchData: decodeURIComponent(this.$route.params.data),
     };
   },
-  created() {
-    this.toSingSearchPage();
-  },
-
-  //decodeURIComponent参数解码
-  methods: {
-    toSingSearchPage() {
-      this.searchData = this.$route.params.data;
-      //如果为自跳转则执行
-      this.$router.push(
-        "/searchBySong/" + decodeURIComponent(this.$route.params.data)
-      );
+  computed: {
+    searchBySong() {
+      return "/searchBySong/" + decodeURIComponent(this.$route.params.data);
+    },
+    searchBySinger() {
+      return "/searchBySinger/" + decodeURIComponent(this.$route.params.data);
+    },
+    searchByVideo() {
+      return "/searchByVideo/" + decodeURIComponent(this.$route.params.data);
+    },
+    searchByPlayList() {
+      return "/searchByPlayList/" + decodeURIComponent(this.$route.params.data);
     },
   },
 };

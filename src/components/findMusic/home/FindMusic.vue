@@ -15,46 +15,13 @@
       </el-menu>
     </el-header>
 
-    <el-container class="container">
-      <!-- 侧边栏 -->
-      <el-aside>
-        <el-menu :router="true" default-active="/findMusic" class="aside_menu">
-          <el-menu-item-group>
-            <el-menu-item index="/findMusic">发现音乐</el-menu-item>
-            <el-menu-item index="">视频</el-menu-item>
-            <el-menu-item index="">朋友</el-menu-item>
-            <el-menu-item index="">直播</el-menu-item>
-            <el-menu-item index="">私人FM</el-menu-item>
-          </el-menu-item-group>
+    <!-- 中间主体 -->
+    <el-main class="main">
+      <keep-alive exclude="ShowMusicList">
+        <router-view ref="child"></router-view>
+      </keep-alive>
+    </el-main>
 
-          <el-menu-item-group>
-            <template slot="title">我的音乐</template>
-            <el-menu-item index="">
-              <i class="el-icon-headset"> 本地音乐</i>
-            </el-menu-item>
-            <el-menu-item index="">
-              <i class="el-icon-download"> 下载管理</i>
-            </el-menu-item>
-          </el-menu-item-group>
-
-          <el-menu-item-group>
-            <template slot="title">创建的歌单</template>
-            <el-menu-item index="">
-              <i class="el-icon-star-off"> 我喜欢的音乐</i>
-            </el-menu-item>
-          </el-menu-item-group>
-        </el-menu>
-      </el-aside>
-
-      <!-- 中间主体 -->
-      <el-container>
-        <el-main>
-          <keep-alive exclude="ShowMusicList">
-            <router-view ref="child"></router-view>
-          </keep-alive>
-        </el-main>
-      </el-container>
-    </el-container>
   </el-container>
 </template>
 
@@ -65,6 +32,11 @@ export default {
       //将当前路由的路径设为选中值
       active: this.$route.path,
     };
+  },
+  watch:{
+    $route(to){
+      this.active = to.path
+    }
   },
   methods: {
     //调用父组价设置音乐url
@@ -110,12 +82,9 @@ export default {
 }
 
 // 上边有60px
-.container {
-  padding-top: 50px;
-}
-
-.el-main {
+.main {
   padding: 0px;
+  padding-top:20px;
 }
 
 .el-header {

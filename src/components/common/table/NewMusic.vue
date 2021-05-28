@@ -19,7 +19,9 @@ export default {
   props: {
     list: {
       type: Object,
-      default: {},
+      default: ()=>{
+        return {}
+      },
     },
   },
   data() {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h4 v-if="offset == 0 || hottest.lenght == 0">精彩评论</h4>
+    <h4 v-if="offset == 0 && hottest.length > 0">精彩评论</h4>
     <!--精彩评论的信息-->
     <div
       v-for="(item, index) in hottest"
@@ -26,6 +26,7 @@ export default {
   components: {
     CommentItem,
   },
+
   props: {
     hottest: {
       type: Array,
@@ -48,12 +49,11 @@ export default {
       default: 0,
     },
   },
+
   data() {
     return {};
   },
-  mounted() {
-    console.log(this.hottest);
-  },
+  
 };
 </script>
 <style lang='less' scoped>

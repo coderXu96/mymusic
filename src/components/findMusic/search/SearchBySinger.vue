@@ -26,6 +26,7 @@
 
 <script>
 export default {
+  name: 'searchBySinger',
   data() {
     return {
       searchData: decodeURIComponent(this.$route.params.data),

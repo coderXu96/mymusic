@@ -1,17 +1,24 @@
 <template>
-  <div style="margin-bottom: 55px">
-    <el-row v-show="toggle == 1" type="flex" justify="center">
-      <i class="el-icon-loading" style="font-size: 20px"></i>数据加载中
+  <div>
+    <loading :show="loading"></loading>
+    <el-row :gutter="20" class="row-flex" v-show="!loading">
+      <el-col
+        v-for="(item, index) in videoList"
+        :key="item + index"
+        class="five-eq"
+      >
+        <music-card :list="item"></music-card>
+      </el-col>
     </el-row>
-    <music-card :musiclist="videoList" v-show="toggle == 2"></music-card>
+
     <!--分页-->
     <el-pagination
       background
       layout="prev, pager, next"
       :page-size="queryInfo.limit"
       :total="videoTotal"
-      v-show="toggle == 2"
       @current-change="handleCurrentChange"
+      v-show="!loading"
     >
     </el-pagination>
   </div>
@@ -20,9 +27,10 @@
 <script>
 import MusicCard from "../../common/card/MusicCard.vue";
 import { MUSICLIST } from "../../common/card/MusicClass";
-
+import Loading from "../../common/loading/Loading.vue";
 export default {
-  components: { MusicCard },
+  name: "searchByVideo",
+  components: { MusicCard, Loading },
   data() {
     return {
       searchData: decodeURIComponent(this.$route.params.data),
@@ -37,17 +45,19 @@ export default {
       videoTotal: 0,
       //歌曲数的结果集
       videoList: [],
-      toggle: 2,
+      // 加载动画
+      loading: false,
     };
   },
 
   created() {
     this.getVideoResult();
   },
+
   methods: {
     //查询搜索的视频结果集
     getVideoResult() {
-      this.toggle = 1
+      this.loading = true;
       this.$http.get("/search", { params: this.queryInfo }).then((res) => {
         let temarr = [];
         for (const item of res.data.result.videos) {
@@ -55,7 +65,7 @@ export default {
           if (item.vid.match(/\D/) != null) {
             linkurl = "/videoPlay/" + item.vid;
           } else {
-            linkurl = "/toVideoPage/" + item.vid;
+            linkurl = "/mvPlay/" + item.vid;
           }
           let tem = new MUSICLIST(
             item.coverUrl,
@@ -67,7 +77,7 @@ export default {
         }
         this.videoList = temarr;
         this.videoTotal = res.data.result.videoCount;
-        this.toggle = 2
+        this.loading = false;
       });
     },
     //跳转视频播放页
@@ -75,7 +85,7 @@ export default {
       if (id.match(/\D/) != null) {
         this.$router.push("/videoPlay/" + id);
       } else {
-        this.$router.push("/toVideoPage/" + id);
+        this.$router.push("/mvPlay/" + id);
       }
     },
     //分页插件页数改变

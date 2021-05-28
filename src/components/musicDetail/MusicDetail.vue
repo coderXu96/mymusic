@@ -42,6 +42,7 @@
     </el-row>
 
     <loading :show="loading"></loading>
+
     <!-- 评论信息 -->
     <el-row>
       <el-col :offset="4" :span="16">
@@ -70,12 +71,11 @@
 
 <script>
 import { getMusicLrc, getMusicComment } from "@/networks/networks.js";
+import Loading from "../common/loading/Loading.vue";
+import CommentList from "../common/comment/CommentList.vue";
 
 // 引入mixin
-import { mixPlayMusic, mixComment } from "../../common/mixin/mixin.js";
-
-import CommentList from "../../common/comment/CommentList.vue";
-import Loading from "../../common/loading/Loading.vue";
+import { mixPlayMusic, mixComment } from "../common/mixin/mixin.js";
 
 export default {
   mixins: [mixPlayMusic, mixComment],
@@ -100,7 +100,7 @@ export default {
   },
 
   mounted() {
-    window.scrollTo(0,0)
+    window.scrollTo(0, 0);
     //dom元素加载完毕后,设置ul默认的向上样式
     this.$refs.lyric.style.marginTop = "-10px";
     if (this.$store.state.isPlay) {
@@ -111,6 +111,8 @@ export default {
   created() {
     //获取音乐的详细信息
     this.getMusicDetail(this.$route.params.id);
+    //获取评论列表
+    this.get_Comment();
   },
 
   destroyed() {
@@ -177,6 +179,7 @@ export default {
   methods: {
     // 查询评论
     get_Comment() {
+      console.log("我没生效");
       this.loading = true;
       getMusicComment(this.queryInfo).then((res) => {
         this.commentList = res.data.comments;
@@ -263,7 +266,6 @@ export default {
     cdRotateStod() {
       window.clearInterval(this.rotate);
     },
-    
   },
 };
 </script>
