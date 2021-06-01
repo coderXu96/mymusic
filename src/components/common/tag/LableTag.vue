@@ -29,7 +29,7 @@ export default {
   },
   data() {
     return {
-      id:-1,
+      id: -1,
     };
   },
   methods: {
@@ -42,7 +42,7 @@ export default {
 };
 </script>
 <style lang='less' scoped>
-@themecolor: #E60026;
+@themecolor: #e60026;
 //标签
 .tag {
   .tagname {
@@ -50,7 +50,6 @@ export default {
     color: #909399;
     flex: 1;
     display: flex;
-    margin-top: 5px;
     .left {
       width: 50px;
     }

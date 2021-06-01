@@ -15,6 +15,7 @@ axios.defaults.baseURL = '/api';
 Vue.prototype.$http = axios;
 
 //全局vue过滤器(时间戳过滤器)
+// 返回年月日时分秒
 Vue.filter('dateFormat', function (originVal) {
   const dt = new Date(originVal)
 
@@ -28,6 +29,16 @@ Vue.filter('dateFormat', function (originVal) {
 
   return `${y}年${m}月${d}日 ${hh}:${mm}:${ss}`
 })
+
+// 返回年月日
+Vue.filter('dateFormatToYMD', function (originVal) {
+  const dt = new Date(originVal)
+  const y = dt.getFullYear()
+  const m = (dt.getMonth() + 1 + '').padStart(2, '0')
+  const d = (dt.getDay() + '').padStart(2, '0')
+  return `${y}-${m}-${d}`
+})
+
 
 //全局过滤器(秒数转化为分钟)
 Vue.filter('timeFormat', function (time) {

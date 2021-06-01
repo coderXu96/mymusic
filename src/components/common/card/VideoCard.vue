@@ -86,6 +86,7 @@ export default {
       right: 5px;
       overflow: hidden;
     }
+    
     .duration {
       font-size: 0.7rem;
       color: white;

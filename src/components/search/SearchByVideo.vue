@@ -25,9 +25,10 @@
 </template>
 
 <script>
-import MusicCard from "../../common/card/MusicCard.vue";
-import { MUSICLIST } from "../../common/card/MusicClass";
-import Loading from "../../common/loading/Loading.vue";
+import MusicCard from "../common/card/MusicCard";
+import { MUSICLIST } from "../common/card/MusicClass";
+import Loading from "../common/loading/Loading.vue";
+
 export default {
   name: "searchByVideo",
   components: { MusicCard, Loading },

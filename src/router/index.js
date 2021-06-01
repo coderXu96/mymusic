@@ -25,24 +25,38 @@ const Content = () => import('../components/Content.vue')
 const Container = () => import('../components/Container.vue')
 
 // 发现音乐
-const FindMusic = () => import('../components/findMusic/home/FindMusic.vue')
-const DiyRecommend = () => import('../components/findMusic/diyRecommend/DiyRecommend.vue')
-const MusicList = () => import("../components/findMusic/musicList/MusicList.vue")
-const MusicRank = () => import("../components/findMusic/musicRank/MusicRank.vue")
-const SingerList = () => import("../components/findMusic/singer/SingerList.vue")
-const NewMusic = () => import('../components/findMusic/newMusic/NewMusic.vue')
+const FindMusic = () => import('../components/findMusic/FindMusic.vue')
+const DiyRecommend = () => import('../components/findMusic/DiyRecommend.vue')
+const MusicList = () => import("../components/findMusic/MusicList.vue")
+const MusicRank = () => import("../components/findMusic/MusicRank.vue")
+const SingerList = () => import("../components/findMusic/SingerList.vue")
+const NewMusic = () => import('../components/findMusic/NewMusic.vue')
+
+
+
+// 搜索
+const SearchPage = () => import('../components/search/SearchPage.vue')
+const SearchBySong = () => import('../components/search/SearchBySong.vue')
+const SearchBySinger = () => import('../components/search/SearchBySinger.vue')
+const SearchByAlbum = () => import('../components/search/SearchByAlbum.vue')
+const SearchByVideo = () => import('../components/search/SearchByVideo.vue')
+const SearchByPlayList = () => import('../components/search/SearchByPlayList.vue')
 
 // 歌单页面
 const SongList = () => import('../components/songList/SongList.vue')
 const ShowMusicList = () => import('../components/songList/ShowMusicList.vue')
 const ShowComment = () => import('../components/songList/ShowComment.vue')
 
-// 搜索
-const SearchPage = () => import('../components/findMusic/search/SearchPage.vue')
-const SearchBySong = () => import('../components/findMusic/search/SearchBySong.vue')
-const SearchBySinger = () => import('../components/findMusic/search/SearchBySinger.vue')
-const SearchByVideo = () => import('../components/findMusic/search/SearchByVideo.vue')
-const SearchByPlayList = () => import('../components/findMusic/search/SearchByPlayList.vue')
+// 专辑页面
+const AlbumDetail = () => import('../components/album/AlbumDetail.vue')
+const AlbumComment = () => import('../components/album/AlbumComment.vue')
+const AlbumMusicList = () => import('../components/album/AlbumMusicList.vue')
+
+// 歌手
+const Singer = () => import('../components/singer/Singer.vue')
+const SingerAlbum = () => import('../components/singer/SingerAlbum.vue')
+const SingerMv = () => import('../components/singer/SingerMv.vue')
+const SingerDesc = () => import('../components/singer/SingerDesc.vue')
 
 // 音乐播放详情
 const MusicDetail = () => import('../components/musicDetail/MusicDetail.vue')
@@ -51,6 +65,27 @@ const MvPlay = () => import('../components/video/MvPlay.vue')
 
 
 // 路由抽离
+// 音乐播放详情
+const MusicDetailR = {
+  path: '/musicDetail/:id',
+  component: MusicDetail
+}
+
+// 歌手页面
+const SingerR = {
+  path: '/singer/:id',
+  component: Singer,
+  redirect: '/singerAlbum/:id',
+  children: [
+    //歌手专辑页
+    { path: '/singerAlbum/:id', component: SingerAlbum },
+    //歌手推荐MV页面
+    { path: '/singerMv/:id', component: SingerMv },
+    //歌手详细页面
+    { path: '/singerDesc/:id', component: SingerDesc }
+  ]
+}
+
 // 发现音乐
 const FindMusicR = {
   path: '/findMusic',
@@ -80,6 +115,7 @@ const SearchPageR = {
     { path: '/searchBySinger/:data', component: SearchBySinger },
     { path: '/searchByVideo/:data', component: SearchByVideo },
     { path: '/searchByPlayList/:data', component: SearchByPlayList },
+    { path: '/SearchByAlbum/:data', component: SearchByAlbum },
   ]
 }
 
@@ -94,13 +130,18 @@ const SongListR = {
   ]
 }
 
-// 音乐播放详情
-const MusicDetailR = {
-  path: '/musicDetail/:id',
-  component: MusicDetail
+// 专辑页面
+const AlbumDetailR = {
+  path: '/albumDetail/:id',
+  component: AlbumDetail,
+  redirect: '/albumMusicList/:id',
+  children: [
+    { path: '/albumMusicList/:id', component: AlbumMusicList },
+    { path: '/albumComment/:id', component: AlbumComment }
+  ]
 }
 
-// 中间部分,不包括底部播放
+// 中间部分,有侧边栏,不包括底部播放
 const ContainerR = {
   path: '/container',
   component: Container,
@@ -109,8 +150,12 @@ const ContainerR = {
     { ...FindMusicR },
     { ...SearchPageR },
     { ...SongListR },
+    { ...AlbumDetailR },
+    { ...SingerR }
   ]
 }
+
+
 
 // 中间部分,包括底部播放,除去顶部导航栏,
 const ContentR = {

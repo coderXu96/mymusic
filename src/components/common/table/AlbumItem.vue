@@ -1,11 +1,12 @@
 <template>
-  <el-row type="flex" align="middle" @click.native="tomusiclist">
+  <el-row type="flex" align="middle" @click.native="toAlbumDetail">
     <el-col :span="12" class="coverinfo">
-      <el-image :src="item.coverImgUrl" class="cover" lazy></el-image>
+      <el-image :src="item.picUrl" class="cover" lazy></el-image>
       <div class="name">{{ item.name }}</div>
     </el-col>
-    <el-col :span="4" class="textinfo"> {{ item.trackCount }}首 </el-col>
-    <el-col :span="8" class="textinfo"> by {{ item.creator.nickname }} </el-col>
+    <el-col :span="8" class="textinfo" @click.native="toSinger">
+      {{ item.artist.name }}
+    </el-col>
   </el-row>
 </template>
 
@@ -24,12 +25,14 @@ export default {
     return {};
   },
 
-  methods:{
-    tomusiclist(){
-      let id = this.item.id
-      this.$router.push('/showMusicList/'+id)
-    }
-  }
+  methods: {
+    toAlbumDetail() {
+      this.$router.push("/albumDetail/" + this.item.id);
+    },
+    toSinger() {
+      this.$router.push("/singer/" + this.item.artist.id);
+    },
+  },
 };
 </script>
 <style lang='less' scoped>
@@ -40,12 +43,12 @@ export default {
     height: 60px;
     width: 60px;
   }
-  .name{
+  .name {
     margin-left: 10px;
   }
 }
-.textinfo{
-  color:#909399;
+.textinfo {
+  color: #0036a3;
   font-size: 0.8rem;
 }
 .el-row:hover {

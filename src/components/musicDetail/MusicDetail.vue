@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
 
     <el-row type="flex" justify="center" align="middle" class="header">
       <!-- 唱片 -->

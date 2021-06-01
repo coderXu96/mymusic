@@ -4,7 +4,7 @@
       <div class="songlistcont">
         <div class="cover">
           <!--歌单图标-->
-          <el-image :src="currentSongList.coverImgUrl" class="coverimg" lazy />
+          <el-image :src="album.blurPicUrl" class="coverimg" lazy />
         </div>
 
         <!--右侧歌曲信息-->
@@ -12,16 +12,7 @@
           <!--标签及名字-->
           <div class="flex">
             <el-tag type="danger" effect="plain" size="small">歌单 </el-tag>
-            <div class="songlistname">{{ currentSongList.name }}</div>
-          </div>
-
-          <!--作者信息-->
-          <div class="flex">
-            <el-image :src="currentSongList.creator.avatarUrl" class="avatar" />
-            <div class="nickname">{{ currentSongList.creator.nickname }}</div>
-            <div class="createTime">
-              {{ currentSongList.createTime | dateFormat }}创建
-            </div>
+            <div class="albumname">{{ album.name }}</div>
           </div>
 
           <!--按钮组-->
@@ -35,63 +26,29 @@
               播放全部
             </el-button>
 
-            <el-button
-              icon="el-icon-folder-add"
-              size="mini"
-              round
-            >
-              收藏({{ currentSongList.subscribedCount }})
+            <el-button icon="el-icon-folder-add" size="mini" round>
+              收藏
             </el-button>
 
             <el-button icon="el-icon-share" size="mini" round>
-              分享({{ currentSongList.shareCount }})
+              分享({{ album.info.shareCount }})
             </el-button>
           </div>
 
-          <!--标签信息-->
+          <!-- 歌手 -->
           <div class="flex">
-            标签:
-            <span
-              class="songListtags"
-              v-for="(item, index) in currentSongList.tags"
-              :key="index"
-            >
-              {{
-                index + 1 === currentSongList.tags.length ? item : item + " / "
-              }}
-            </span>
-          </div>
-
-          <!-- 歌曲,播放量 -->
-          <div class="flex">
-            <div>
-              歌曲:
-              <span class="gary">
-                {{ currentSongList.trackCount }}
-              </span>
-            </div>
-            <div style="margin-left: 20px">
-              播放:
-              <span class="gary">
-                {{ (currentSongList.playCount / 10000).toFixed(0) }}万
-              </span>
+            <div class="info">
+              歌手:<span class="artist">{{ album.artist.name }}</span>
             </div>
           </div>
 
-          <!--简介信息-->
+          <!-- 时间 -->
           <div class="flex">
-            <!-- 简介:{{ currentSongList.description }} -->
-            <el-collapse style="width: 100%">
-              <el-collapse-item
-                :title="
-                  '简介: ' +
-                  (currentSongList.description + '').substr(0, 15) +
-                  '...'
-                "
-              >
-                <p>{{ currentSongList.description }}</p>
-              </el-collapse-item>
-            </el-collapse>
+            <div class="info">
+              时间:<span class="publishTime">{{
+                album.publishTime | dateFormatToYMD
+              }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -101,17 +58,17 @@
       <el-menu :default-active="index" class="childmenu" mode="horizontal">
         <el-menu-item index="1" @click="showMusicList">歌曲列表</el-menu-item>
         <el-menu-item index="2" @click="showComment">
-          评论({{ currentSongList.commentCount }})
+          评论({{ album.info.commentCount }})
         </el-menu-item>
       </el-menu>
 
-      <router-view ref="child" :tracks="currentSongList.trackIds"></router-view>
+      <router-view ref="child" :songs="songs"></router-view>
     </el-main>
   </el-container>
 </template>
 
 <script>
-import { getSongListInfo } from "@/networks/networks.js";
+import { getAlbumInfo } from "@/networks/networks.js";
 
 export default {
   name: "SongList",
@@ -119,21 +76,24 @@ export default {
     return {
       index: "1",
       currentId: this.$route.params.id,
-      currentSongList: {
-        coverImgUrl: "",
+      album: {
+        blurPicUrl: "",
+        name: "",
         //创建人信息
-        creator: {
-          avatarUrl: "",
-          nickname: "",
+        info: {
+          shareCount: "",
         },
-        trackIds: [],
+        artist: {
+          name: "",
+        },
+        songs: [],
       },
     };
   },
 
   created() {
     // 首次进入页面获取
-    this.get_songlist_info();
+    this.get_album_info();
   },
 
   activated() {
@@ -145,30 +105,41 @@ export default {
     if (cid != this.currentId) {
       this.currentId = cid;
       // 重新获取歌单信息
-      this.get_songlist_info();
+      this.get_album_info();
     }
   },
 
   methods: {
     // 获取歌单信息
-    get_songlist_info() {
-      getSongListInfo(this.currentId).then((res) => {
-        this.currentSongList = res.data.playlist;
+    get_album_info() {
+      getAlbumInfo(this.currentId).then((res) => {
+        this.songs = res.data.songs;
+        // 处理时长数据
+        this.songs.forEach((item) => {
+          const dt = new Date(item.dt);
+          const mm = (dt.getMinutes() + "").padStart(2, "0");
+          const ss = (dt.getSeconds() + "").padStart(2, "0");
+          // 处理成子组件可用
+          item.duration = mm + ":" + ss;
+          item.artists = item.ar;
+          item.album = item.al;
+        });
+
+        this.album = res.data.album;
       });
     },
 
     // 跳转到歌单列表页面
     showMusicList() {
       this.index = "1";
-      this.$router.replace("/showMusicList/" + this.currentId);
+      this.$router.replace("/albumMusicList/" + this.currentId);
     },
 
     // 跳转到评论页面
     showComment() {
       this.index = "2";
-      this.$router.replace("/showComment/" + this.currentId);
+      this.$router.replace("/albumComment/" + this.currentId);
     },
-  
   },
 };
 </script>
@@ -184,7 +155,7 @@ export default {
 .flex {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .songlistcont {
@@ -212,18 +183,19 @@ export default {
 .songinfo {
   flex: 1;
   margin-left: 15px;
-  .songlistname {
+  .albumname {
     font-size: 1.4rem;
     margin-left: 15px;
   }
-  .avatar {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-  }
-  .nickname {
-    color: @linkcolor;
-    margin-left: 10px;
+  .info {
+    font-size: 0.8rem;
+    .artist {
+      color: @linkcolor;
+      margin-left: 15px;
+    }
+    .publishTime {
+      margin-left: 15px;
+    }
   }
   .createTime {
     color: @graycolor;

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
     <loading :show="loading"></loading>
     <music-info
       :list="songList"
@@ -23,11 +22,11 @@
 </template>
 
 <script>
-import MusicInfo from "../../common/music/MusicInfo.vue";
+import MusicInfo from "../common/music/MusicInfo.vue";
 
 // 引入axios
 import { getSearchResult } from "@/networks/networks.js";
-import Loading from "../../common/loading/Loading.vue";
+import Loading from "../common/loading/Loading.vue";
 
 export default {
   name: 'searchBySong',

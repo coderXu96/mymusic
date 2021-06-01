@@ -80,6 +80,7 @@ export function getCommentList(queryInfo) {
 }
 
 // 搜索
+// type: 搜索类型；默认为 1 即单曲 , 取值意义 : 1: 单曲, 10: 专辑, 100: 歌手, 1000: 歌单, 1002: 用户, 1004: MV, 1006: 歌词, 1009: 电台, 1014: 视频, 1018:综合
 export function getSearchResult(queryInfo) {
   return axios.get("/search", { params: queryInfo })
 }
@@ -103,4 +104,31 @@ export function getSimiMvs(curMvId) {
 export function getMvCommentList(queryInfo) {
   return axios.get("comment/mv", { params: queryInfo })
 }
+
+// 获取歌手热门50首歌
+export function getHot50Music(singerId) {
+  return axios.get("artist/top/song", { params: { id: singerId } })
+}
+
+// 获取歌手的热门专辑信息
+export function getHotAlbum(queryInfo) {
+  return axios.get("artist/album", { params: queryInfo })
+}
+
+// 获取歌手mv的信息
+export function getSingerMv(queryInfo) {
+  return axios.get("artist/mv", { params: queryInfo })
+}
+
+// 获取专辑信息
+export function getAlbumInfo(albumId) {
+  return axios.get("/album", { params: { id: albumId } })
+}
+
+// 获取专辑评论
+export function getAlbumComment(queryInfo) {
+  return axios.get("/comment/album", { params: queryInfo })
+}
+
+
 

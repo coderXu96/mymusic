@@ -24,7 +24,6 @@
     </el-header>
 
     <el-main>
-      <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
 
       <loading :show="loading"></loading>
 
@@ -53,11 +52,11 @@
 </template>
 
 <script>
-import MusicCard from "../../common/card/MusicCard.vue";
-import LableTag from "../../common/tag/LableTag.vue";
+import MusicCard from "../common/card/MusicCard.vue";
+import LableTag from "../common/tag/LableTag.vue";
 
-import { MUSICLIST } from "../../common/card/MusicClass";
-import Loading from "../../common/loading/Loading.vue";
+import { MUSICLIST } from "../common/card/MusicClass";
+import Loading from "../common/loading/Loading.vue";
 
 export default {
   components: { MusicCard, LableTag ,Loading},
@@ -145,7 +144,7 @@ export default {
       this.$http.get("artist/list", { params: this.queryInfo }).then((res) => {
         let temarr = [];
         for (const item of res.data.artists) {
-          let linkurl = "/songlist/" + item.id;
+          let linkurl = "/singer/" + item.id;
           let tem = new MUSICLIST(item.img1v1Url, item.name, "", linkurl);
           temarr.push(tem);
         }

@@ -12,37 +12,32 @@
       </el-header>
     </el-row>
 
-    <loading :show='loading'></loading>
+    <loading :show="loading"></loading>
 
     <div class="muscilist" v-show="!loading">
-      <el-backtop :bottom='80' :visibility-height='400'></el-backtop>
       <el-row
         v-for="(item, index) in newMusicInfo"
         :key="item.index"
         :style="index % 2 === 0 ? 'background: rgb(245,245,247)' : ''"
       >
         <el-col :span="24">
-          <new-music :list="item" @dblclick="playMusic"></new-music>
+          <new-music :item="item"></new-music>
         </el-col>
       </el-row>
     </div>
-
   </div>
 </template>
 
 <script>
-import NewMusic from "../../common/table/NewMusic.vue";
-import LableTag from "../../common/tag/LableTag.vue";
+import NewMusic from "../common/table/NewMusic.vue";
+import LableTag from "../common/tag/LableTag.vue";
 
-import { NEWMUSIC } from "../../common/table/NewMusic.js";
-import { getNewMusic } from "../../../networks/networks.js";
+import { NEWMUSIC } from "../common/table/NewMusic.js";
+import { getNewMusic } from "../../networks/networks.js";
 
-// 引入mixin
-import {mixPlayMusic} from '../../common/mixin/mixin.js'
-import Loading from '../../common/loading/Loading.vue';
+import Loading from "../common/loading/Loading.vue";
 
 export default {
-  mixins:[mixPlayMusic],
   components: { LableTag, NewMusic, Loading },
   data() {
     return {
@@ -60,7 +55,7 @@ export default {
       ],
       //最新音乐的数据
       newMusicInfo: [],
-      loading:false
+      loading: false,
     };
   },
   created() {
@@ -69,7 +64,7 @@ export default {
   },
   methods: {
     get_new_music() {
-      this.loading = true
+      this.loading = true;
       getNewMusic(this.queryInfo).then((res) => {
         let temarr = [];
         for (const item of res.data.data) {
@@ -78,12 +73,13 @@ export default {
             item.album.picUrl,
             item.name,
             item.alias[0],
-            item.artists[0].name
+            item.artists[0].name,
+            item.artists[0].id
           );
           temarr.push(tem);
         }
         this.newMusicInfo = temarr;
-        this.loading = false
+        this.loading = false;
       });
     },
 

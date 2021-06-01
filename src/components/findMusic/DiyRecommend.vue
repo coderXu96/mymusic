@@ -1,6 +1,5 @@
 <template>
   <el-container>
-    <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
     <el-header height="200px">
       <el-carousel type="card" height="200px">
         <el-carousel-item
@@ -26,9 +25,7 @@
     </el-header>
 
     <el-main>
-      <!-- 推荐歌单 -->
-      <p style="margin-bottom: 10px; font-size: 22px">推荐歌单</p>
-
+      <div class="title">推荐歌单</div>
       <el-row :gutter="20" class="row-flex">
         <el-col
           v-for="(item, index) in musiclist"
@@ -40,7 +37,7 @@
       </el-row>
 
       <!-- 独家放送 -->
-      <p style="margin-bottom: 10px; font-size: 22px">独家放送</p>
+      <div class="title">独家放送</div>
       <el-row :gutter="20" class="row-flex">
         <el-col
           :span="8"
@@ -49,26 +46,24 @@
           style="margin-bottom: 10px"
           class="mark-img"
         >
-          <el-image :src="item.sPicUrl"> </el-image>
-          <div class="name">{{ item.name }}</div>
+          <el-image :src="item.sPicUrl" @click="mvPlay(item.id)" class="image">
+          </el-image>
+          <div class="name" @click="mvPlay(item.id)">{{ item.name }}</div>
           <span class="playvideo"><i class="el-icon-video-play"></i></span>
         </el-col>
       </el-row>
 
-      <!-- 最新音乐 -->
-      <p style="margin-bottom: 10px; font-size: 22px">最新音乐</p>
-
+      <div class="title">最新音乐</div>
       <el-row :gutter="20">
         <el-col
           :span="8"
           v-for="(item, index) in newmusiclist"
           :key="item + index"
-          class="mar_top_20"
+          class="newmusiclist"
         >
           <new-music
-            :list="item"
+            :item="item"
             class="newmusiccont"
-            @dblclick="playMusic"
           ></new-music>
         </el-col>
       </el-row>
@@ -77,11 +72,11 @@
 </template>
 
 <script>
-import MusicCard from "../../common/card/MusicCard.vue";
-import NewMusic from "../../common/table/NewMusic.vue";
+import MusicCard from "../common/card/MusicCard.vue";
+import NewMusic from "../common/table/NewMusic.vue";
 
-import { MUSICLIST } from "../../common/card/MusicClass";
-import { NEWMUSIC } from "../../common/table/NewMusic";
+import { MUSICLIST } from "../common/card/MusicClass";
+import { NEWMUSIC } from "../common/table/NewMusic";
 
 // 引入networks
 import {
@@ -92,7 +87,7 @@ import {
 } from "@/networks/networks.js";
 
 // 引入mixin
-import { mixPlayMusic } from "../../common/mixin/mixin.js";
+import { mixPlayMusic } from "../common/mixin/mixin.js";
 
 export default {
   mixins: [mixPlayMusic],
@@ -114,6 +109,7 @@ export default {
       newmusic_icon: require("@/assets/images/newmusic_icon.png"),
     };
   },
+
   created() {
     //获取轮播图数据
     getBannerInfo().then((res) => {
@@ -146,12 +142,14 @@ export default {
     getNewmusicList().then((res) => {
       let temarr = [];
       for (const item of res.data.result) {
+        console.log(item);
         let tem = new NEWMUSIC(
           item.id,
           item.picUrl,
           item.name,
           item.song.alias[0],
-          item.song.artists[0].name
+          item.song.artists[0].name,
+          item.song.artists[0].id
         );
         temarr.push(tem);
       }
@@ -159,17 +157,17 @@ export default {
     });
   },
   methods: {
-    //点击歌单跳转界面
+    // 点击歌单跳转界面
     toSongListPage(id) {
       this.$router.push("/songlist/" + id);
     },
 
-    //点击独家放松的图片跳转mv页面
-    toVideoPage(mvId) {
-      this.$router.push("toVideoPage/" + mvId);
+    // 点击独家放松的图片跳转mv页面
+    mvPlay(mvId) {
+      this.$router.push("mvPlay/" + mvId);
     },
 
-    //点击歌手名跳转歌手详细页面
+    // 点击歌手名跳转歌手详细页面
     toSingerPage(row) {
       this.$router.push("/singer/" + row.song.artists[0].id);
     },
@@ -178,9 +176,20 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.newmusiclist{
+  margin-bottom: 10px;
+}
+.title {
+  margin: 20px 0px;
+  font-size: 1.4rem;
+}
 // 角标
 .mark-img {
   position: relative;
+  .image,
+  .name {
+    cursor: pointer;
+  }
 }
 
 .mark-tag {

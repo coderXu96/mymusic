@@ -1,6 +1,5 @@
 export class NEWMUSIC {
-  
-  constructor(id,picUrl,songName,aliasName = '',artists,){
+  constructor(id,picUrl,songName,aliasName = '',artists,singerId){
     // 音乐id
     this.id = id
     // 图片
@@ -11,5 +10,7 @@ export class NEWMUSIC {
     this.aliasName = aliasName
     // 歌手名称
     this.artists = artists
+    // 歌手id
+    this.singerId = singerId
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 评论信息 -->
-    <loading :show='loading'></loading>
+    <loading :show="loading"></loading>
 
     <comment-list
       :hottest="hotCommentList"
@@ -26,7 +26,7 @@
 
 <script>
 // 引入 networks
-import { getCommentList } from "@/networks/networks.js";
+import { getAlbumComment } from "@/networks/networks.js";
 
 // 引入 mixin
 import { mixComment } from "../common/mixin/mixin.js";
@@ -41,7 +41,7 @@ export default {
   mixins: [mixComment],
   components: {
     CommentList,
-    Loading
+    Loading,
   },
   data() {
     return {};
@@ -49,13 +49,13 @@ export default {
   methods: {
     // 查询评论
     get_Comment() {
-      this.loading = true
-      getCommentList(this.queryInfo).then((res) => {
+      this.loading = true;
+      getAlbumComment(this.queryInfo).then((res) => {
         console.log(this.queryInfo);
         this.commentList = res.data.comments;
         this.hotCommentList = res.data.hotComments;
         this.total = res.data.total;
-        this.loading = false
+        this.loading = false;
         this.cur_page = 1;
       });
     },

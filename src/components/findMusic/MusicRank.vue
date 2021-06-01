@@ -3,7 +3,6 @@
     <!-- 官方榜 -->
     <el-header height="auto" class="title">官方榜</el-header>
     <el-main>
-      <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
       <el-row
         :gutter="20"
         class="RankList"
@@ -18,13 +17,13 @@
             @click="toSongListPage(item.id)"
           ></el-image>
         </el-col>
-        <el-col :span="20">
+        <el-col :span="20" @click.native="toSongListPage(item.id)">
           <el-table :data="item.tracks" stripe :show-header="false">
             <el-table-column type="index">
               <template scope="scope">
-                <span style="color: red; font-weight: 400">{{
-                  scope.$index + 1
-                }}</span>
+                <span style="color: red; font-weight: 400"  >
+                  {{ scope.$index + 1 }}
+                </span>
               </template>
             </el-table-column>
 
@@ -35,6 +34,7 @@
               align="right"
               class-name="second"
             ></el-table-column>
+
           </el-table>
         </el-col>
       </el-row>
@@ -85,13 +85,15 @@
 </template>
 
 <script>
-import MusicCard from "../../common/card/MusicCard.vue";
-import { MUSICLIST } from "../../common/card/MusicClass";
+import MusicCard from "../common/card/MusicCard.vue";
+import { MUSICLIST } from "../common/card/MusicClass";
 
 import { getOfficialRankList } from "@/networks/networks.js";
-
+import {mixPlayMusic} from '../common/mixin/mixin.js'
 export default {
+  mixins:[mixPlayMusic],
   components: { MusicCard },
+
   data() {
     return {
       //排行榜的所有数据
@@ -117,6 +119,7 @@ export default {
       playhover: require("@/assets/images/play.png"),
     };
   },
+
   computed: {
     official() {
       return this.musicRankList.slice(0, 4);
@@ -136,10 +139,12 @@ export default {
       return temarr;
     },
   },
+
   created() {
-    //获取官方榜单的数据
+    // 获取官方榜单的数据
     this.get_official_ranklist();
   },
+
   methods: {
     get_official_ranklist() {
       getOfficialRankList().then((res) => {
@@ -147,20 +152,15 @@ export default {
         this.singerRankInfo = res.data.artistToplist;
       });
     },
-    
-    //点击歌单跳转界面
+
+    // 点击歌单跳转界面
     toSongListPage(id) {
       this.$router.push("/songlist/" + id);
     },
 
-    //双击歌曲添加数据进去,并循环播放(向父组件传递参数)
-    playMusicList(row) {
-      this.$emit(
-        "setSongListInfo",
-        window.localStorage.getItem("playlist"),
-        row.id
-      );
-    },
+    toplayMusic(id){
+      console.log(id);
+    }
   },
 };
 </script>

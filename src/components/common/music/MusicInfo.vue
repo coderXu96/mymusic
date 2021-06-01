@@ -11,7 +11,6 @@
       label="音乐标题"
       prop="name"
       min-width="30%"
-      style="cursor: pointer"
       show-overflow-tooltip
     ></el-table-column>
 
@@ -34,12 +33,13 @@
       </template>
     </el-table-column>
 
-    <el-table-column
-      label="专辑"
-      prop="album.name"
-      min-width="15%"
-      show-overflow-tooltip
-    ></el-table-column>
+    <el-table-column label="专辑" min-width="15%" show-overflow-tooltip>
+      <template slot-scope="scope">
+        <span class="album" @click="toAlbumDetail(scope.row.album.id)">
+          {{ scope.row.album.name }}
+        </span>
+      </template>
+    </el-table-column>
 
     <el-table-column
       label="时长"
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { mixPlayMusic } from "../../common/mixin/mixin.js";
+import { mixPlayMusic } from "../mixin/mixin.js";
 
 export default {
   mixins: [mixPlayMusic],
@@ -66,15 +66,29 @@ export default {
       default: 0,
     },
   },
-  data() {
-    return {};
+  mounted() {
+    console.log(this.list);
   },
   methods: {
+    // 播放
     getmusic(row) {
       this.playMusic(row.id);
+    },
+
+    // 歌手
+    toSingerPage(id) {
+      this.$router.push("/singer/" + id);
+    },
+
+    // 专辑
+    toAlbumDetail(id) {
+      this.$router.push("/albumDetail/" + id);
     },
   },
 };
 </script>
 <style lang='less' scoped>
+.album {
+  cursor: pointer;
+}
 </style>

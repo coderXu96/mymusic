@@ -83,8 +83,8 @@ export default {
 
 // 上边有60px
 .main {
-  padding: 0px;
-  padding-top:20px;
+  padding: 10px;
+  padding-top:40px;
 }
 
 .el-header {

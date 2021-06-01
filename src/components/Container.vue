@@ -33,11 +33,12 @@
     <!-- 中间主体 -->
     <el-container class="center">
       <el-main>
-        <keep-alive exclude="searchPage">
+        <keep-alive exclude="searchPage,singer">
           <router-view ref="child"></router-view>
         </keep-alive>
       </el-main>
     </el-container>
+    
   </el-container>
 </template>
 

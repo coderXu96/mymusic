@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    
+    <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
     <!-- 头部 -->
     <el-header class="header">
       <music-header></music-header>
@@ -52,7 +52,6 @@ export default {
 .main {
   margin: 60px 0px 70px 0px;
 }
-
 
 .el-menu {
   .el-menu-item {

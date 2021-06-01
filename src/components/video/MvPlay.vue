@@ -1,6 +1,5 @@
 <template>
   <el-row :gutter="30">
-    <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
 
     <el-col :span="12" :offset="4">
       <div class="title" @click="$router.go(-1)">
@@ -120,9 +119,7 @@ export default {
       this.get_Comment();
     },
   },
-  activated() {
-    console.log("123");
-  },
+  
   created() {
     // 获取当前mv的详细数据
     this.get_mvdetail_info();
@@ -130,6 +127,10 @@ export default {
     this.get_mvurl();
     // 获取相关mv
     this.get_simimvs();
+  },
+
+  mounted(){
+    window.scrollTo(0,0)
   },
 
   methods: {
@@ -154,7 +155,6 @@ export default {
         this.commentList = res.data.comments;
         this.hotCommentList = res.data.hotComments;
         this.total = res.data.total;
-        console.log(this.commentList);
         this.loading = false;
         this.cur_page = 1;
       });

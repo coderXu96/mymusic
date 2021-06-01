@@ -10,8 +10,6 @@
     </el-header>
 
     <el-main>
-      <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
-
       <loading :show="loading"></loading>
 
       <el-row :gutter="20" class="row-flex" v-show="!loading">
@@ -40,14 +38,14 @@
 </template>
 
 <script>
-import MusicCard from "../../common/card/MusicCard.vue";
-import LableTag from "../../common/tag/LableTag.vue";
+import MusicCard from "../common/card/MusicCard.vue";
+import LableTag from "../common/tag/LableTag.vue";
 
-import { MUSICLIST } from "../../common/card/MusicClass";
+import { MUSICLIST } from "../common/card/MusicClass";
 
 // 引入networks
 import { getHotMusicListTags, getGoodMusicList } from "@/networks/networks.js";
-import Loading from "../../common/loading/Loading.vue";
+import Loading from "../common/loading/Loading.vue";
 
 export default {
   components: { MusicCard, LableTag, Loading },

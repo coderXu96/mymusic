@@ -9,11 +9,12 @@
       >
         <el-menu-item :index="searchBySong"> 单曲 </el-menu-item>
         <el-menu-item :index="searchBySinger"> 歌手 </el-menu-item>
+        <el-menu-item :index="searchByAlbum">专辑 </el-menu-item>
         <el-menu-item :index="searchByVideo"> 视频 </el-menu-item>
         <el-menu-item :index="searchByPlayList"> 歌单 </el-menu-item>
-        <el-menu-item>歌词</el-menu-item>
+        <!-- <el-menu-item>歌词</el-menu-item>
         <el-menu-item>主播电台</el-menu-item>
-        <el-menu-item>用户</el-menu-item>
+        <el-menu-item>用户</el-menu-item> -->
       </el-menu>
     </el-header>
 
@@ -40,6 +41,9 @@ export default {
     },
     searchBySinger() {
       return "/searchBySinger/" + decodeURIComponent(this.$route.params.data);
+    },
+    searchByAlbum() {
+      return "/searchByAlbum/" + decodeURIComponent(this.$route.params.data);
     },
     searchByVideo() {
       return "/searchByVideo/" + decodeURIComponent(this.$route.params.data);

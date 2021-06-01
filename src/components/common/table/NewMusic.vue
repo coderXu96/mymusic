@@ -1,26 +1,30 @@
 <template>
-  <div class="newmusiclist" @dblclick="dblclick(list.id)">
-    <el-image :src="list.picUrl" class="newmusic_img" lazy></el-image>
+  <div class="newmusicitem" @dblclick="playMusic(item.id)">
+    <el-image :src="item.picUrl" class="newmusic_img" lazy></el-image>
     <el-image :src="newmusic_icon" class="newmusic_icon"></el-image>
     <div class="newmusic_text">
       <div class="name">
-        {{ list.songName }}
-        <span v-if="list.aliasName" class="aliasName"
-          >({{ list.aliasName }})</span
-        >
+        {{ item.songName }}
+        <span v-if="item.aliasName" class="aliasName">
+          ({{ item.aliasName }})
+        </span>
       </div>
-      <div class="song">{{ list.artists }}</div>
+      <div class="song" @click="toSinger">{{ item.artists }}</div>
     </div>
   </div>
 </template>
 
 <script>
+// 引入mixin
+import { mixPlayMusic } from "../../common/mixin/mixin";
+
 export default {
+  mixins: [mixPlayMusic],
   props: {
-    list: {
+    item: {
       type: Object,
-      default: ()=>{
-        return {}
+      default: () => {
+        return {};
       },
     },
   },
@@ -30,14 +34,15 @@ export default {
     };
   },
   methods: {
-    dblclick(id) {
-      this.$emit("dblclick", id);
+    toSinger() {
+      this.$router.push("singer/" + this.item.singerId);
     },
   },
 };
 </script>
+
 <style lang='less' scoped>
-.newmusiclist {
+.newmusicitem {
   user-select: none;
   position: relative;
   display: flex;
@@ -66,9 +71,9 @@ export default {
     margin-left: 7px;
     overflow: hidden; //超出的文本隐藏
     white-space: nowrap; //溢出不换行 （只显示一行）
-    .song,
-    span {
+    .song {
       color: #909399;
+      cursor: pointer;
     }
   }
 }

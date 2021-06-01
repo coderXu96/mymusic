@@ -1,6 +1,5 @@
 <template>
   <div>
-    <el-backtop :bottom="80" :visibility-height="400"> </el-backtop>
     <loading :show="loading"></loading>
     <div v-for="(item, index) in playList" :key="index" v-show="!loading">
       <div :class="{ backg: index % 2 != 0 }">
@@ -14,6 +13,7 @@
       layout="prev, pager, next"
       :page-size="queryInfo.limit"
       :total="playListTotal"
+      :current-page.sync="cur_page"
       @current-change="handleCurrentChange"
       v-show="!loading"
     >
@@ -22,13 +22,13 @@
 </template>
 
 <script>
-import Loading from "../../common/loading/Loading.vue";
-import PlayList from "../../common/table/PlayList.vue";
+import Loading from "../common/loading/Loading.vue";
+import PlayList from "../common/table/PlayList.vue";
 
 // 引入axios
-import {getSearchResult} from '@/networks/networks'
+import { getSearchResult } from "@/networks/networks";
 export default {
-  name: 'searchByPlayList',
+  name: "searchByPlayList",
   components: { PlayList, Loading },
   data() {
     return {
@@ -46,6 +46,8 @@ export default {
       playListTotal: 0,
       //歌曲数的结果集
       playList: [],
+      //分页器当前页码
+      cur_page: 1,
     };
   },
   created() {
@@ -54,12 +56,12 @@ export default {
   methods: {
     //查询搜索的歌手结果集
     getPlayListResult() {
-      this.loading = true
-      getSearchResult(this.queryInfo).then(res => {
+      this.loading = true;
+      getSearchResult(this.queryInfo).then((res) => {
         this.playList = res.data.result.playlists;
         this.playListTotal = res.data.result.playlistCount;
-        this.loading = false
-      })
+        this.loading = false;
+      });
     },
 
     //分页插件页数改变

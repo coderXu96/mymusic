@@ -37,4 +37,8 @@ export default {
   z-index: 999;
   background: rgb(255, 255, 255);
 }
+
+/deep/.el-main{
+  padding: 10px;
+}
 </style>
