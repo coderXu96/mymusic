@@ -32,7 +32,10 @@ const MusicRank = () => import("../components/findMusic/MusicRank.vue")
 const SingerList = () => import("../components/findMusic/SingerList.vue")
 const NewMusic = () => import('../components/findMusic/NewMusic.vue')
 
-
+// 视频
+const VideoPage = () => import('../components/video/VideoPage.vue')
+const VideoList = () => import('../components/video/VideoList.vue')
+const MvList = () => import('../components/video/MvList.vue')
 
 // 搜索
 const SearchPage = () => import('../components/search/SearchPage.vue')
@@ -60,8 +63,9 @@ const SingerDesc = () => import('../components/singer/SingerDesc.vue')
 
 // 音乐播放详情
 const MusicDetail = () => import('../components/musicDetail/MusicDetail.vue')
-// mv播放
+// mv和video播放
 const MvPlay = () => import('../components/video/MvPlay.vue')
+const VideoPlay = () => import('../components/video/VideoPlay.vue')
 
 
 // 路由抽离
@@ -102,6 +106,16 @@ const FindMusicR = {
     { path: '/SingerList', component: SingerList },
     // 最新音乐模块
     { path: '/newMusicList', component: NewMusic },
+  ]
+}
+
+const VideoPageR = {
+  path: '/videoPage',
+  component: VideoPage,
+  redirect: '/videoList',
+  children: [
+    { path: '/videoList', component: VideoList },
+    { path: '/mvList', component: MvList },
   ]
 }
 
@@ -148,6 +162,7 @@ const ContainerR = {
   redirect: '/findMusic',
   children: [
     { ...FindMusicR },
+    { ...VideoPageR },
     { ...SearchPageR },
     { ...SongListR },
     { ...AlbumDetailR },
@@ -168,10 +183,14 @@ const ContentR = {
   ]
 }
 
-// mv播放详情
+// mv和video播放详情
 const MvPlayR = {
   path: '/mvPlay/:id',
   component: MvPlay
+}
+const VideoPlayR = {
+  path: '/videoPlay/:id',
+  component: VideoPlay
 }
 
 
@@ -184,6 +203,7 @@ const routes = [
     children: [
       { ...ContentR },
       { ...MvPlayR },
+      { ...VideoPlayR }
     ],
   },
 ]

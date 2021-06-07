@@ -9,7 +9,7 @@
           ({{ item.aliasName }})
         </span>
       </div>
-      <div class="song" @click="toSinger">{{ item.artists }}</div>
+      <div class="song" @click="toSinger">{{ item.singerName }}</div>
     </div>
   </div>
 </template>

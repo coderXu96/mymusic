@@ -2,12 +2,8 @@
   <div>
     <loading :show="loading"></loading>
     <el-row :gutter="20" class="row-flex" v-show="!loading">
-      <el-col
-        v-for="(item, index) in videoList"
-        :key="item + index"
-        class="five-eq"
-      >
-        <music-card :list="item"></music-card>
+      <el-col v-for="(item, index) in videoList" :key="item + index" :span="6">
+        <mv-card :item="item"></mv-card>
       </el-col>
     </el-row>
 
@@ -25,30 +21,40 @@
 </template>
 
 <script>
-import MusicCard from "../common/card/MusicCard";
-import { MUSICLIST } from "../common/card/MusicClass";
+// 引入axios
+import { getSearchResult } from "@/networks/networks";
+
 import Loading from "../common/loading/Loading.vue";
+import MvCard from "../common/card/MvCard.vue";
 
 export default {
   name: "searchByVideo",
-  components: { MusicCard, Loading },
+  components: { Loading, MvCard },
   data() {
     return {
       searchData: decodeURIComponent(this.$route.params.data),
-      //当前的搜索条件
+      // 当前的搜索条件
       queryInfo: {
         keywords: this.$route.params.data,
-        limit: 30,
+        limit: 60,
         offset: 0,
         type: 1014,
       },
-      //查询结果总数
+      // 查询结果总数
       videoTotal: 0,
-      //歌曲数的结果集
+      // 歌曲数的结果集
       videoList: [],
       // 加载动画
       loading: false,
     };
+  },
+
+  // 监听搜索变化
+  watch: {
+    "$store.state.search"(newVal) {
+      this.queryInfo.keywords = newVal;
+      this.getVideoResult();
+    },
   },
 
   created() {
@@ -56,40 +62,27 @@ export default {
   },
 
   methods: {
-    //查询搜索的视频结果集
+    // 查询搜索的视频结果集
     getVideoResult() {
       this.loading = true;
-      this.$http.get("/search", { params: this.queryInfo }).then((res) => {
-        let temarr = [];
-        for (const item of res.data.result.videos) {
-          let linkurl = "";
-          if (item.vid.match(/\D/) != null) {
-            linkurl = "/videoPlay/" + item.vid;
-          } else {
-            linkurl = "/mvPlay/" + item.vid;
-          }
-          let tem = new MUSICLIST(
-            item.coverUrl,
-            item.title,
-            item.playTime,
-            linkurl
-          );
-          temarr.push(tem);
-        }
-        this.videoList = temarr;
+      getSearchResult(this.queryInfo).then((res) => {
+        this.videoList = res.data.result.videos;
         this.videoTotal = res.data.result.videoCount;
+        this.videoList.forEach((item) => {
+          item.id = item.vid;
+          item.playCount = item.playTime;
+          item.duration = item.durationms;
+          item.imgurl = item.coverUrl;
+          item.name = item.title;
+          item.userName = item.creator[0].userName;
+          item.userId = item.creator[0].userId;
+        });
+        console.log(this.videoList);
         this.loading = false;
       });
     },
-    //跳转视频播放页
-    toVideoPage(id) {
-      if (id.match(/\D/) != null) {
-        this.$router.push("/videoPlay/" + id);
-      } else {
-        this.$router.push("/mvPlay/" + id);
-      }
-    },
-    //分页插件页数改变
+
+    // 分页插件页数改变
     handleCurrentChange(newPage) {
       this.queryInfo.offset = (newPage - 1) * this.queryInfo.limit;
       if (this.queryInfo.offset >= this.songTotal)

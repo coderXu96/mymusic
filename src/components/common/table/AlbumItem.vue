@@ -4,7 +4,7 @@
       <el-image :src="item.picUrl" class="cover" lazy></el-image>
       <div class="name">{{ item.name }}</div>
     </el-col>
-    <el-col :span="8" class="textinfo" @click.native="toSinger">
+    <el-col :span="8" class="textinfo" @click.stop.native="toSinger">
       {{ item.artist.name }}
     </el-col>
   </el-row>

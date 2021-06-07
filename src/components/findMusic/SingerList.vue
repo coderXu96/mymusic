@@ -1,22 +1,22 @@
 <template>
   <el-container>
-    <el-header class="tag" height="auto">
+    <el-header height="auto">
       <lable-tag
-        :taglist="areaList"
+        :item="areaList"
         title="语种"
         type="area"
         @changetag="changetag"
       ></lable-tag>
 
       <lable-tag
-        :taglist="typeList"
+        :item="typeList"
         title="分类"
         type="type"
         @changetag="changetag"
       ></lable-tag>
 
       <lable-tag
-        :taglist="initialList"
+        :item="initialList"
         title="筛选"
         type="initial"
         @changetag="changetag"
@@ -24,7 +24,6 @@
     </el-header>
 
     <el-main>
-
       <loading :show="loading"></loading>
 
       <el-row :gutter="20" class="row-flex" v-show="!loading">
@@ -33,7 +32,7 @@
           :key="item + index"
           class="five-eq"
         >
-          <music-card :list="item"></music-card>
+          <music-card :item="item"></music-card>
         </el-col>
       </el-row>
 
@@ -52,14 +51,15 @@
 </template>
 
 <script>
+// 引入网络连接
+import { getSingerList } from "@/networks/networks.js";
+
 import MusicCard from "../common/card/MusicCard.vue";
 import LableTag from "../common/tag/LableTag.vue";
-
-import { MUSICLIST } from "../common/card/MusicClass";
 import Loading from "../common/loading/Loading.vue";
 
 export default {
-  components: { MusicCard, LableTag ,Loading},
+  components: { MusicCard, LableTag, Loading },
   data() {
     return {
       // 歌手列表
@@ -125,8 +125,8 @@ export default {
     };
   },
   created() {
-    //获取歌手数据
-    this.getSingerList();
+    //获取歌手数据s
+    this.get_singer_list();
   },
   methods: {
     // 改变标签选择
@@ -135,20 +135,19 @@ export default {
       this.queryInfo[type] = id;
       // 将查询偏移量变成0
       this.queryInfo.offset = 0;
-      this.getSingerList();
+      this.get_singer_list();
     },
 
-    //获取歌手数据
-    getSingerList() {
+    // 获取歌手数据
+    get_singer_list() {
       this.loading = true;
-      this.$http.get("artist/list", { params: this.queryInfo }).then((res) => {
-        let temarr = [];
-        for (const item of res.data.artists) {
-          let linkurl = "/singer/" + item.id;
-          let tem = new MUSICLIST(item.img1v1Url, item.name, "", linkurl);
-          temarr.push(tem);
-        }
-        this.singerList = temarr;
+      getSingerList(this.queryInfo).then((res) => {
+        this.singerList = res.data.artists;
+        this.singerList.forEach((item) => {
+          item.linkurl = "/singer/" + item.id;
+          item.coverImgUrl = item.img1v1Url;
+          item.name = item.name;
+        });
         this.loading = false;
       });
     },
@@ -156,7 +155,7 @@ export default {
     //分页插件页数改变
     handleCurrentChange(newPage) {
       this.queryInfo.offset = (newPage - 1) * this.queryInfo.limit;
-      this.getSingerList();
+      this.get_singer_list();
     },
 
     //跳转歌手详情页

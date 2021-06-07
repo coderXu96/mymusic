@@ -1,8 +1,8 @@
 <template>
   <el-container>
-    <el-header class="tag" height="20px">
+    <el-header height="20px" class="tag">
       <lable-tag
-        :taglist="hotMusicListTags"
+        :item="hotMusicListTags"
         :title="'分类'"
         :type="'cat'"
         @changetag="changetag"
@@ -18,7 +18,7 @@
           :key="item + index"
           class="five-eq"
         >
-          <music-card :list="item" :hover="true"></music-card>
+          <music-card :item="item" :hover="true"></music-card>
         </el-col>
       </el-row>
 
@@ -40,12 +40,10 @@
 <script>
 import MusicCard from "../common/card/MusicCard.vue";
 import LableTag from "../common/tag/LableTag.vue";
-
-import { MUSICLIST } from "../common/card/MusicClass";
+import Loading from "../common/loading/Loading.vue";
 
 // 引入networks
 import { getHotMusicListTags, getGoodMusicList } from "@/networks/networks.js";
-import Loading from "../common/loading/Loading.vue";
 
 export default {
   components: { MusicCard, LableTag, Loading },
@@ -105,19 +103,14 @@ export default {
     get_good_musiclist() {
       this.loading = true;
       getGoodMusicList(this.queryInfo).then((res) => {
-        let temarr = [];
-        for (const item of res.data.playlists) {
-          let linkurl = "/songlist/" + item.id;
-          let tem = new MUSICLIST(
-            item.coverImgUrl,
-            item.name,
-            item.playCount,
-            linkurl
-          );
-          temarr.push(tem);
-        }
-        this.goodMusicList = temarr;
+        this.goodMusicList = res.data.playlists;
         this.goodMusicListTotal = res.data.total;
+        this.goodMusicList.forEach((item) => {
+          item.linkurl = "/songlist/" + item.id;
+          item.coverImgUrl = item.coverImgUrl;
+          item.name = item.name;
+          item.playCount = item.playCount;
+        });
         this.loading = false;
       });
     },
@@ -135,3 +128,8 @@ export default {
   },
 };
 </script>
+<style lang="less" scoped>
+.tag {
+  margin-bottom: 20px;
+}
+</style>

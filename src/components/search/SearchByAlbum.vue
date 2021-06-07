@@ -22,12 +22,12 @@
 </template>
 
 <script>
-import Loading from "../common/loading/Loading.vue";
-import PlayList from "../common/table/PlayList.vue";
-
 // 引入axios
 import { getSearchResult } from "@/networks/networks";
-import AlbumItem from '../common/table/AlbumItem.vue';
+
+import Loading from "../common/loading/Loading.vue";
+import PlayList from "../common/table/PlayList.vue";
+import AlbumItem from "../common/table/AlbumItem.vue";
 
 export default {
   name: "searchByAlbum",
@@ -52,15 +52,25 @@ export default {
       cur_page: 1,
     };
   },
+
+  // 监听搜索变化
+  watch: {
+    "$store.state.search"(newVal) {
+      this.queryInfo.keywords = newVal;
+      this.getPlayListResult();
+      this.cur_page = 1
+    },
+  },
+
   created() {
     this.getPlayListResult();
   },
+
   methods: {
     //查询搜索的歌手结果集
     getPlayListResult() {
       this.loading = true;
       getSearchResult(this.queryInfo).then((res) => {
-        console.log(res.data.result);
         this.album = res.data.result.albums;
         this.albumTotal = res.data.result.albumCount;
         this.loading = false;

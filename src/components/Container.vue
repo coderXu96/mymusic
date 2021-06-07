@@ -5,7 +5,7 @@
       <el-menu :router="true" default-active="/findMusic" class="aside_menu">
         <el-menu-item-group>
           <el-menu-item index="/findMusic">发现音乐</el-menu-item>
-          <el-menu-item index="">视频</el-menu-item>
+          <el-menu-item index="/videoPage">视频</el-menu-item>
           <el-menu-item index="">朋友</el-menu-item>
           <el-menu-item index="">直播</el-menu-item>
           <el-menu-item index="">私人FM</el-menu-item>

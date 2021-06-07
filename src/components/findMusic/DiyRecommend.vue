@@ -32,7 +32,7 @@
           :key="item + index"
           class="five-eq"
         >
-          <music-card :list="item" :hover="true"></music-card>
+          <music-card :item="item" :hover="true"></music-card>
         </el-col>
       </el-row>
 
@@ -61,10 +61,7 @@
           :key="item + index"
           class="newmusiclist"
         >
-          <new-music
-            :item="item"
-            class="newmusiccont"
-          ></new-music>
+          <new-music :item="item" class="newmusiccont"></new-music>
         </el-col>
       </el-row>
     </el-main>
@@ -74,9 +71,6 @@
 <script>
 import MusicCard from "../common/card/MusicCard.vue";
 import NewMusic from "../common/table/NewMusic.vue";
-
-import { MUSICLIST } from "../common/card/MusicClass";
-import { NEWMUSIC } from "../common/table/NewMusic";
 
 // 引入networks
 import {
@@ -95,6 +89,7 @@ export default {
     MusicCard,
     NewMusic,
   },
+
   data() {
     return {
       //轮播图数据列表
@@ -111,52 +106,56 @@ export default {
   },
 
   created() {
-    //获取轮播图数据
-    getBannerInfo().then((res) => {
-      if (res.status !== 200) this.$message.error("轮播图数据获取失败");
-      this.bannerinfo = res.data.banners;
-    });
-
-    //获取推荐歌单数据
-    getMusicList().then((res) => {
-      let temarr = [];
-      for (const item of res.data.playlists) {
-        let linkurl = "/songlist/" + item.id;
-        let tem = new MUSICLIST(
-          item.coverImgUrl,
-          item.name,
-          item.playCount,
-          linkurl
-        );
-        temarr.push(tem);
-      }
-      this.musiclist = temarr;
-    });
-
-    //获取独家放送数据
-    getPrivateList().then((res) => {
-      this.privateList = res.data.result;
-    });
-
-    //获取最新音乐的推送信息
-    getNewmusicList().then((res) => {
-      let temarr = [];
-      for (const item of res.data.result) {
-        console.log(item);
-        let tem = new NEWMUSIC(
-          item.id,
-          item.picUrl,
-          item.name,
-          item.song.alias[0],
-          item.song.artists[0].name,
-          item.song.artists[0].id
-        );
-        temarr.push(tem);
-      }
-      this.newmusiclist = temarr;
-    });
+    this.get_banner_info();
+    this.get_music_list();
+    this.get_newmusic_list();
+    this.get_private_list()
   },
+  
   methods: {
+    // 获取轮播图数据
+    get_banner_info() {
+      getBannerInfo().then((res) => {
+        if (res.status !== 200) this.$message.error("轮播图数据获取失败");
+        this.bannerinfo = res.data.banners;
+      });
+    },
+
+    // 获取推荐歌单数据
+    get_music_list() {
+      getMusicList().then((res) => {
+        this.musiclist = res.data.playlists;
+        this.musiclist.forEach((item) => {
+          item.linkurl = "/songlist/" + item.id;
+          item.coverImgUrl = item.coverImgUrl;
+          item.name = item.name;
+          item.playCount = item.playCount;
+        });
+      });
+    },
+
+    // 独家放送
+    get_private_list(){
+      getPrivateList().then(res => {
+        this.privateList = res.data.result
+      })  
+    },
+
+    // 获取最新音乐的推送信息
+    get_newmusic_list() {
+      getNewmusicList().then((res) => {
+        this.newmusiclist = res.data.result;
+        this.newmusiclist.forEach((item) => {
+          item.id = item.id;
+          item.picUrl = item.picUrl;
+          item.songName = item.name;
+          item.aliasName = item.song.alias[0];
+          item.singerName = item.song.artists[0].name;
+          item.singerId = item.song.artists[0].id;
+        });
+      });
+    },
+
     // 点击歌单跳转界面
     toSongListPage(id) {
       this.$router.push("/songlist/" + id);
@@ -176,7 +175,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.newmusiclist{
+.newmusiclist {
   margin-bottom: 10px;
 }
 .title {

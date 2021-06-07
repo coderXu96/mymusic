@@ -66,9 +66,6 @@ export default {
       default: 0,
     },
   },
-  mounted() {
-    console.log(this.list);
-  },
   methods: {
     // 播放
     getmusic(row) {

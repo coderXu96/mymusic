@@ -7,21 +7,40 @@
         mode="horizontal"
         class="header_menu"
       >
-        <el-menu-item :index="searchBySong"> 单曲 </el-menu-item>
-        <el-menu-item :index="searchBySinger"> 歌手 </el-menu-item>
-        <el-menu-item :index="searchByAlbum">专辑 </el-menu-item>
-        <el-menu-item :index="searchByVideo"> 视频 </el-menu-item>
-        <el-menu-item :index="searchByPlayList"> 歌单 </el-menu-item>
-        <!-- <el-menu-item>歌词</el-menu-item>
-        <el-menu-item>主播电台</el-menu-item>
-        <el-menu-item>用户</el-menu-item> -->
+        <el-menu-item
+          :class="{ 'is-active': active == searchBySong }"
+          :index="searchBySong"
+        >
+          单曲
+        </el-menu-item>
+        <el-menu-item
+          :class="{ 'is-active': active == searchBySinger }"
+          :index="searchBySinger"
+        >
+          歌手
+        </el-menu-item>
+        <el-menu-item
+          :class="{ 'is-active': active == searchByAlbum }"
+          :index="searchByAlbum"
+          >专辑
+        </el-menu-item>
+        <el-menu-item
+          :class="{ 'is-active': active == searchByVideo }"
+          :index="searchByVideo"
+        >
+          视频
+        </el-menu-item>
+        <el-menu-item
+          :class="{ 'is-active': active == searchByPlayList }"
+          :index="searchByPlayList"
+        >
+          歌单
+        </el-menu-item>
       </el-menu>
     </el-header>
 
     <el-main>
-      <keep-alive>
-        <router-view />
-      </keep-alive>
+      <router-view />
     </el-main>
   </el-container>
 </template>
@@ -29,13 +48,11 @@
 <script>
 export default {
   name: "searchPage",
-  data() {
-    return {
-      //将当前路由的路径设为选中值,有中文的话需要解码
-      active: decodeURIComponent(this.$route.path),
-    };
-  },
   computed: {
+    active() {
+      //将当前路由的路径设为选中值,有中文的话需要解码
+      return decodeURIComponent(this.$route.path);
+    },
     searchBySong() {
       return "/searchBySong/" + decodeURIComponent(this.$route.params.data);
     },
@@ -57,6 +74,9 @@ export default {
 
 <style lang="less" scoped>
 @themecolor: #e60026;
+.qqq {
+  color: @themecolor;
+}
 .header_menu {
   .el-menu-item {
     font-size: 1.1rem;

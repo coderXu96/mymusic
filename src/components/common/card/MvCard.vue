@@ -1,35 +1,26 @@
 <template>
   <div class="card">
     <div class="image_cont">
-      <img
-        class="image"
-        :src="item.imgurl"
-        @click="toMvPage"
-        lazy
-      />
+      <div class="imagebox">
+        <img class="image" :src="item.imgurl" @click="toplay" lazy />
+      </div>
+
       <span class="playCount" v-if="item.playCount">
         <i class="el-icon-caret-right"></i>
-        {{
-          item.playCount >= 10000
-            ? (item.playCount / 10000).toFixed(0) + "万"
-            : item.playCount
-        }}
+        {{ item.playCount | to10000 }}
       </span>
-      <span class="duration">
+      <span class="duration" v-if="item.duration">
         {{ (item.duration / 1000) | timeFormat }}
       </span>
     </div>
 
-    <div @click="toMvPage" class="name">{{ item.name }}</div>
-
-    <span class="playCount" v-if="item.playCount">
-      <i class="el-icon-caret-right"></i>
-      {{
-        item.playCount >= 10000
-          ? (item.playCount / 10000).toFixed(0) + "万"
-          : item.playCount
-      }}
-    </span>
+    <div @click="toplay" class="info">
+      <el-tag v-if="item.type == 0" size="mini" effect="plain" type="danger">
+        MV
+      </el-tag>
+      <span class="title" :title="item.name">{{ item.name }}</span>
+      <div class="userName" v-if="item.userName">by {{ item.userName }}</div>
+    </div>
   </div>
 </template>
 
@@ -50,23 +41,41 @@ export default {
     };
   },
   methods: {
-    // 跳转mv界面
-    toMvPage() {
-      this.$router.push("/mvPlay/" + this.item.id);
+    // 跳转播放界面
+    toplay() {
+      if (this.item.type == 1) {
+        this.$router.push("/videoPlay/" + this.item.id);
+      } else {
+        this.$router.push("/mvPlay/" + this.item.id);
+      }
     },
   },
 };
 </script>
 <style lang='less' scoped>
+@graycolor: #909399;
 .card {
   position: relative;
   margin-bottom: 15px;
-  .image {
+
+  .imagebox {
+    position: relative;
+    content: "";
     width: 100%;
-    height: 100%;
-    border-radius: 4px;
-    cursor: pointer;
+    padding-top: 66%;
+    display: block;
+    .image {
+      border-radius: 4px;
+      cursor: pointer;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+    }
   }
+
   .image_cont {
     position: relative;
   }
@@ -84,8 +93,20 @@ export default {
     cursor: pointer;
   }
 
-  .name {
+  .info {
     margin-top: 7px;
+    font-size: 0.6rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    .title {
+      margin-left: 2px;
+    }
+    .userName {
+      margin-top: 3px;
+      color: @graycolor;
+      cursor: pointer;
+    }
   }
 
   .playCount {

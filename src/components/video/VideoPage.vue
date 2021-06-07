@@ -7,11 +7,8 @@
         :router="true"
         mode="horizontal"
       >
-        <el-menu-item index="/diyRecommend">个性推荐</el-menu-item>
-        <el-menu-item index="/musicList">歌单</el-menu-item>
-        <el-menu-item index="/musicRank">排行榜</el-menu-item>
-        <el-menu-item index="/singerList">歌手</el-menu-item>
-        <el-menu-item index="/newMusicList">最新音乐</el-menu-item>
+        <el-menu-item index="/videoList">视频</el-menu-item>
+        <el-menu-item index="/mvList">MV</el-menu-item>
       </el-menu>
     </el-header>
 

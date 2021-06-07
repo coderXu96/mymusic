@@ -1,6 +1,8 @@
 <template>
   <div class="singerlist">
+    <loading :show="loading"></loading>
     <el-row
+      v-show="!loading"
       v-for="(item, index) in singerList"
       :key="item.index"
       :style="index % 2 === 0 ? 'background: rgb(245,245,247)' : ''"
@@ -18,15 +20,23 @@
       background
       :page-size="queryInfo.limit"
       :total="singerTotal"
+      :current-page.sync="cur_page"
       @current-change="handleCurrentChange"
+      v-show="!loading"
     >
     </el-pagination>
   </div>
 </template>
 
 <script>
+// 引入axios
+import { getSearchResult } from "@/networks/networks.js";
+
+import Loading from "../common/loading/Loading.vue";
+
 export default {
-  name: 'searchBySinger',
+  components: { Loading },
+  name: "searchBySinger",
   data() {
     return {
       searchData: decodeURIComponent(this.$route.params.data),
@@ -41,24 +51,42 @@ export default {
       singerTotal: 0,
       // 歌手
       singerList: [],
+      // 分页器当前页码
+      cur_page: 1,
+      // 正在加载
+      loading: false,
     };
   },
+
+  // 监听搜索变化
+  watch: {
+    "$store.state.search"(newVal) {
+      this.queryInfo.keywords = newVal;
+      this.getSingerResult();
+      this.cur_page = 1
+    },
+  },
+
   created() {
     this.getSingerResult();
   },
   methods: {
-    //查询搜索的歌手结果集
+    // 查询搜索的歌手结果集
     getSingerResult() {
-      this.$http.get("/search", { params: this.queryInfo }).then((res) => {
+      this.loading = true;
+      getSearchResult(this.queryInfo).then((res) => {
         this.singerList = res.data.result.artists;
         this.singerTotal = res.data.result.artistCount;
+        this.loading = false;
       });
     },
-    //跳转歌手页
+
+    // 跳转歌手页
     toSingerPage(id) {
       this.$router.push("/singer/" + id);
     },
-    //分页插件页数改变
+
+    // 分页插件页数改变
     handleCurrentChange(newPage) {
       this.queryInfo.offset = (newPage - 1) * this.queryInfo.limit;
       if (this.queryInfo.offset >= this.songTotal)
@@ -77,7 +105,7 @@ export default {
     .el-col {
       display: flex;
       align-items: center;
-      span{
+      span {
         margin-left: 10px;
       }
     }

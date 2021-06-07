@@ -2,11 +2,11 @@
   <el-row :gutter="30">
     <el-col :span="12" :offset="4">
       <div class="title" @click="$router.go(-1)">
-        <i class="el-icon-arrow-left"></i>MV详情
+        <i class="el-icon-arrow-left"></i>视频详情
       </div>
-      
+
       <!-- 视频播放和相关信息 -->
-      <video-info :item="mvDetailInfo" :url="mvUrl"></video-info>
+      <video-info :item="videoDetailInfo" :url="videoUrl"></video-info>
 
       <loading :show="loading"></loading>
       <div>
@@ -36,7 +36,7 @@
       <div class="title">相关推荐</div>
 
       <!--可点击的视频推荐区域-->
-      <el-row v-for="(item, index) in simiMvList" :key="index">
+      <el-row v-for="(item, index) in relatedVideosList" :key="index">
         <el-col :span="24">
           <relevant-card :item="item"></relevant-card>
         </el-col>
@@ -47,10 +47,10 @@
 
 <script>
 import {
-  getMvUrl,
-  getMvDetailInfo,
-  getMvCommentList,
-  getSimiMvs,
+  getVideoUrl,
+  getVideoDetailInfo,
+  getVideoCommentList,
+  getRelatedVideos,
 } from "@/networks/networks.js";
 
 import CommentList from "../common/comment/CommentList.vue";
@@ -66,27 +66,27 @@ export default {
   data() {
     return {
       // 当前mv的id
-      curMvId: this.$route.params.id,
+      curVideoId: this.$route.params.id,
       // 当前mv的详细数据
-      mvDetailInfo: {},
+      videoDetailInfo: {},
       // 当前mv的url
-      mvUrl: "",
+      videoUrl: "",
       // 与当前mv相关的mv
-      simiMvList: [],
+      relatedVideosList: [],
     };
   },
 
   watch: {
     "$route.params.id"(newval) {
-      this.curMvId = newval;
+      this.curVideoId = newval;
       this.queryInfo.id = newval;
       this.cur_page = 1;
       // 获取当前mv的详细数据
-      this.get_mvdetail_info();
+      this.get_videodetail_info();
       // 获取当前mv的url
-      this.get_mvurl();
+      this.get_videourl();
       // 获取相关mv
-      this.get_simimvs();
+      this.get_related_videos();
       // 获取评论
       this.get_Comment();
     },
@@ -94,11 +94,11 @@ export default {
 
   created() {
     // 获取当前mv的详细数据
-    this.get_mvdetail_info();
+    this.get_videodetail_info();
     // 获取当前mv的url
-    this.get_mvurl();
+    this.get_videourl();
     // 获取相关mv
-    this.get_simimvs();
+    this.get_related_videos();
   },
 
   mounted() {
@@ -106,24 +106,30 @@ export default {
   },
 
   methods: {
-    //获取当前mv的详细数据
-    get_mvdetail_info() {
-      getMvDetailInfo(this.curMvId).then((res) => {
-        this.mvDetailInfo = res.data.data;
+    //获取当前视频的详细数据
+    get_videodetail_info() {
+      getVideoDetailInfo(this.curVideoId).then((res) => {
+        console.log(res.data.data);
+        this.videoDetailInfo = res.data.data;
+
+        this.videoDetailInfo.artistName = this.videoDetailInfo.creator.nickname;
+        this.videoDetailInfo.playCount = this.videoDetailInfo.playTime;
+        this.videoDetailInfo.name = this.videoDetailInfo.title;
+        this.videoDetailInfo.desc = this.videoDetailInfo.description;
       });
     },
 
-    //获取当前mv的url
-    get_mvurl() {
-      getMvUrl(this.curMvId).then((res) => {
-        this.mvUrl = res.data.data.url;
+    //获取当前视频的url
+    get_videourl() {
+      getVideoUrl(this.curVideoId).then((res) => {
+        this.videoUrl = res.data.urls[0].url;
       });
     },
 
-    //获取当前mv的评论数据
+    //获取当前视频的评论数据
     get_Comment() {
       this.loading = true;
-      getMvCommentList(this.queryInfo).then((res) => {
+      getVideoCommentList(this.queryInfo).then((res) => {
         this.commentList = res.data.comments;
         this.hotCommentList = res.data.hotComments;
         this.total = res.data.total;
@@ -132,10 +138,20 @@ export default {
       });
     },
 
-    //获取相关的mv
-    get_simimvs() {
-      getSimiMvs(this.curMvId).then((res) => {
-        this.simiMvList = res.data.mvs;
+    //获取相关的视频
+    get_related_videos() {
+      getRelatedVideos(this.curVideoId).then((res) => {
+        console.log(res.data.data);
+        this.relatedVideosList = res.data.data;
+         this.relatedVideosList.forEach(item => {
+           item.type = 1
+           item.id = item.vid
+           item.cover = item.coverUrl
+           item.playCount = item.playTime
+           item.duration = item.durationms
+           item.name = item.title
+           item.artistName = item.creator[0].userName
+         })
       });
     },
   },

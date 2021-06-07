@@ -21,7 +21,7 @@
           <el-table :data="item.tracks" stripe :show-header="false">
             <el-table-column type="index">
               <template scope="scope">
-                <span style="color: red; font-weight: 400"  >
+                <span style="color: red; font-weight: 400">
                   {{ scope.$index + 1 }}
                 </span>
               </template>
@@ -34,7 +34,6 @@
               align="right"
               class-name="second"
             ></el-table-column>
-
           </el-table>
         </el-col>
       </el-row>
@@ -77,7 +76,7 @@
           :key="item + index"
           class="five-eq"
         >
-          <music-card :list="item"></music-card>
+          <music-card :item="item"></music-card>
         </el-col>
       </el-row>
     </el-main>
@@ -86,12 +85,11 @@
 
 <script>
 import MusicCard from "../common/card/MusicCard.vue";
-import { MUSICLIST } from "../common/card/MusicClass";
 
 import { getOfficialRankList } from "@/networks/networks.js";
-import {mixPlayMusic} from '../common/mixin/mixin.js'
+import { mixPlayMusic } from "../common/mixin/mixin.js";
 export default {
-  mixins:[mixPlayMusic],
+  mixins: [mixPlayMusic],
   components: { MusicCard },
 
   data() {
@@ -125,18 +123,14 @@ export default {
       return this.musicRankList.slice(0, 4);
     },
     globa() {
-      let temarr = [];
-      for (const item of this.musicRankList.slice(4, 30)) {
-        let linkurl = "/songlist/" + item.id;
-        let tem = new MUSICLIST(
-          item.coverImgUrl,
-          item.name,
-          item.playCount,
-          linkurl
-        );
-        temarr.push(tem);
-      }
-      return temarr;
+      let arr = this.musicRankList.slice(4, 30)
+      arr.forEach((item) => {
+        item.linkurl = "/songlist/" + item.id;
+        item.coverImgUrl = item.coverImgUrl;
+        item.name = item.name;
+        item.playCount = item.playCount;
+      });
+      return arr
     },
   },
 
@@ -158,9 +152,9 @@ export default {
       this.$router.push("/songlist/" + id);
     },
 
-    toplayMusic(id){
+    toplayMusic(id) {
       console.log(id);
-    }
+    },
   },
 };
 </script>

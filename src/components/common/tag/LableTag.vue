@@ -1,40 +1,52 @@
 <template>
-  <el-row type="flex" justify="left" class="tagname">
-    <el-col class="left">{{ title }}:</el-col>
-    <el-col class="right">
-      <div class="tagtext" v-for="(item, index) in taglist" :key="index">
-        <span :class="{ actived: id == item.id }" @click="changetag(item.id)">
-          {{ item.name }}
+  <div class="tag">
+    <div class="left" v-if="title">{{ title }}:</div>
+    <div class="right">
+      <div class="tagtext" v-for="(row, index) in item" :key="index">
+        <span
+          :class="{ actived: checked == row.id }"
+          @click="changetag(row.id)"
+        >
+          {{ row.name }}
         </span>
       </div>
-    </el-col>
-  </el-row>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
   props: {
-    taglist: {
+    // 默认选中
+    defaultChecked: {
+      default: -1,
+    },
+    // 元素对象
+    item: {
       type: Array,
       default: () => [],
     },
+    // 左边title
     title: {
       type: String,
-      default: "分类",
     },
+    // 返回的键值
     type: {
       type: String,
       default: "",
     },
   },
+
   data() {
     return {
-      id: -1,
+      // 默认选中
+      checked: this.defaultChecked,
     };
   },
+
   methods: {
     changetag(id) {
-      this.id = id;
+      this.checked = id;
       // 向外发射方法
       this.$emit("changetag", id, this.type);
     },
@@ -45,38 +57,38 @@ export default {
 @themecolor: #e60026;
 //标签
 .tag {
-  .tagname {
-    font-size: 0.7rem;
-    color: #909399;
+  display: flex;
+  justify-content: left;
+  font-size: 0.7rem;
+  color: #909399;
+  display: flex;
+  line-height: 2rem;
+  .left {
+    width: 50px;
+  }
+
+  .right {
     flex: 1;
     display: flex;
-    .left {
-      width: 50px;
-    }
+    flex-wrap: wrap;
 
-    .right {
-      flex: 1;
-      display: flex;
-      flex-wrap: wrap;
+    .tagtext {
+      min-width: 77px; //设置最小宽度撑开
+      text-align: center;
 
-      .tagtext {
-        min-width: 77px; //设置最小宽度撑开
-        text-align: center;
-
-        span {
-          padding: 2px 12px;
-          margin: 0px 8px;
-          border-radius: 30px;
-          cursor: pointer;
-        }
+      span {
+        padding: 2px 12px;
+        margin: 0px 8px;
+        border-radius: 30px;
+        cursor: pointer;
       }
     }
+  }
 
-    .actived {
-      //被选中的tag标签
-      color: @themecolor;
-      background: rgb(255, 232, 232);
-    }
+  .actived {
+    //被选中的tag标签
+    color: @themecolor;
+    background: rgb(255, 232, 232);
   }
 }
 </style>

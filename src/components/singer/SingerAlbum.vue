@@ -177,19 +177,6 @@ export default {
     get_HotAlbum() {
       getHotAlbum(this.queryInfo).then((res) => {
         this.hotAlbum = res.data.hotAlbums;
-        this.hotAlbum.forEach((item) => {
-          this.$http.get("album", { params: { id: item.id } }).then((res) => {
-            //处理时长 再放入数据
-            res.data.songs.forEach((item) => {
-              const dt = new Date(item.dt);
-              const mm = (dt.getMinutes() + "").padStart(2, "0");
-              const ss = (dt.getSeconds() + "").padStart(2, "0");
-
-              item.dt = mm + ":" + ss;
-            });
-            this.albumMusicInfo.push(res.data);
-          });
-        });
         //处理时长数据
         this.hotAlbum.forEach((item) => {
           const dt = new Date(item.dt);

@@ -22,10 +22,10 @@
 </template>
 
 <script>
-import MusicInfo from "../common/music/MusicInfo.vue";
-
 // 引入axios
 import { getSearchResult } from "@/networks/networks.js";
+
+import MusicInfo from "../common/music/MusicInfo.vue";
 import Loading from "../common/loading/Loading.vue";
 
 export default {
@@ -40,13 +40,13 @@ export default {
         offset: 0,
         type: 1,
       },
-      //查询结果总数
+      // 查询结果总数
       songTotal: 0,
-      //歌曲数的结果集
+      // 歌曲数的结果集
       songList: [],
-      //用来显示加载数据,默认不显示
+      // 用来显示加载数据,默认不显示
       loading: false,
-      //分页器当前页码
+      // 分页器当前页码
       cur_page: 1,
     };
   },
@@ -56,6 +56,7 @@ export default {
     "$store.state.search"(newVal){
       this.queryInfo.keywords = newVal
       this.get_search_result();
+      this.cur_page = 1
     }
   },
 

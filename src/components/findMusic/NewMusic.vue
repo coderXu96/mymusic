@@ -4,7 +4,7 @@
     <el-row>
       <el-header class="tag" height="30px">
         <lable-tag
-          :taglist="musicType"
+          :item="musicType"
           :title="'语种'"
           :type="'type'"
           @changetag="changetag"
@@ -29,12 +29,11 @@
 </template>
 
 <script>
-import NewMusic from "../common/table/NewMusic.vue";
-import LableTag from "../common/tag/LableTag.vue";
-
-import { NEWMUSIC } from "../common/table/NewMusic.js";
+// 引入网络连接
 import { getNewMusic } from "../../networks/networks.js";
 
+import NewMusic from "../common/table/NewMusic.vue";
+import LableTag from "../common/tag/LableTag.vue";
 import Loading from "../common/loading/Loading.vue";
 
 export default {
@@ -66,19 +65,15 @@ export default {
     get_new_music() {
       this.loading = true;
       getNewMusic(this.queryInfo).then((res) => {
-        let temarr = [];
-        for (const item of res.data.data) {
-          let tem = new NEWMUSIC(
-            item.id,
-            item.album.picUrl,
-            item.name,
-            item.alias[0],
-            item.artists[0].name,
-            item.artists[0].id
-          );
-          temarr.push(tem);
-        }
-        this.newMusicInfo = temarr;
+        this.newMusicInfo = res.data.data;
+        this.newMusicInfo.forEach((item) => {
+          item.id = item.id;
+          item.picUrl = item.album.picUrl;
+          item.songName = item.name;
+          item.aliasName = item.alias[0];
+          item.singerName = item.artists[0].name;
+          item.singerId = item.artists[0].id;
+        });
         this.loading = false;
       });
     },
@@ -96,6 +91,9 @@ export default {
 };
 </script>
 <style lang="less" scoped>
+.tag {
+  margin-bottom: 20px;
+}
 .muscilist {
   .el-row {
     padding: 10px 0px;

@@ -35,11 +35,7 @@
               播放全部
             </el-button>
 
-            <el-button
-              icon="el-icon-folder-add"
-              size="mini"
-              round
-            >
+            <el-button icon="el-icon-folder-add" size="mini" round>
               收藏({{ currentSongList.subscribedCount }})
             </el-button>
 
@@ -73,7 +69,7 @@
             <div style="margin-left: 20px">
               播放:
               <span class="gary">
-                {{ (currentSongList.playCount / 10000).toFixed(0) }}万
+                {{ currentSongList.playCount | to10000 }}
               </span>
             </div>
           </div>
@@ -168,7 +164,6 @@ export default {
       this.index = "2";
       this.$router.replace("/showComment/" + this.currentId);
     },
-  
   },
 };
 </script>

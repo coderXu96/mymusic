@@ -4,6 +4,10 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
+    // 登录状态
+    isLogin: false,
+    // 用户信息
+    userProfile: [],
     // 搜索内容
     search: '',
     // 播放音乐的链接
@@ -31,7 +35,7 @@ export default new Vuex.Store({
   },
   mutations: {
     // 修改搜索内容
-    changeSearch(state,payload){
+    changeSearch(state, payload) {
       state.search = payload.search
     },
 
@@ -77,6 +81,23 @@ export default new Vuex.Store({
     // 播放完毕
     musicEnded(state) {
       state.isPlay = false
+    },
+
+    // 登录成功
+    login(state) {
+      state.isLogin = true
+    },
+
+    // 退出成功
+    logout(state) {
+      state.isLogin = false
+      state.userProfile = null
+    },
+
+    // 设置用户信息
+    setUserProfile(state, payload) {
+      state.isLogin = true
+      state.userProfile = payload
     }
   },
   actions: {

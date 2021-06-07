@@ -3,22 +3,18 @@
     <div class="image_cont">
       <img
         class="image"
-        :src="list.image"
-        @click="linkto(list.linkurl)"
+        :src="item.coverImgUrl"
+        @click="linkto(item.linkurl)"
         lazy
-      >
+      />
       <!-- 悬停播放按钮 -->
       <el-image :src="playhover" class="playhover" v-if="hover"></el-image>
     </div>
 
-    <div @click="linkto(list.linkurl)" class="name">{{ list.name }}</div>
-    <span class="playCount" v-if="list.playCount">
+    <div @click="linkto(item.linkurl)" class="name">{{ item.name }}</div>
+    <span class="playCount" v-if="item.playCount">
       <i class="el-icon-caret-right"></i>
-      {{
-        list.playCount >= 10000
-          ? (list.playCount / 10000).toFixed(0) + "万"
-          : list.playCount
-      }}
+      {{ item.playCount | to10000 }}
     </span>
   </div>
 </template>
@@ -27,7 +23,7 @@
 export default {
   name: "musicCard",
   props: {
-    list: {
+    item: {
       type: Object,
       default: () => {
         return {};
@@ -51,11 +47,12 @@ export default {
   },
 };
 </script>
+
 <style lang='less' scoped>
 .card {
   position: relative;
   margin-bottom: 15px;
-  .image{
+  .image {
     width: 100%;
     height: 100%;
     border-radius: 4px;
@@ -79,7 +76,7 @@ export default {
   }
 
   .name {
-    margin-top:7px;
+    margin-top: 7px;
   }
 
   .playCount {

@@ -2,18 +2,13 @@
   <div class="videoinfo">
     <div class="card">
       <div class="image_cont">
-        <img class="image" :src="item.cover" lazy @click="toMvPage"/>
+        <img class="image" :src="item.cover" lazy @click="toplay" />
       </div>
-
       <span class="playCount" v-if="item.playCount">
         <i class="el-icon-caret-right"></i>
-        {{
-          item.playCount >= 10000
-            ? (item.playCount / 10000).toFixed(0) + "万"
-            : item.playCount
-        }}
+        {{ item.playCount | to10000 }}
       </span>
-      <span class="duration">
+      <span class="duration" v-if="item.duration">
         {{ (item.duration / 1000) | timeFormat }}
       </span>
     </div>
@@ -45,8 +40,12 @@ export default {
   },
   methods: {
     //跳转推荐mv界面
-    toMvPage() {
-      this.$router.push("/mvPlay/" + this.item.id);
+    toplay() {
+      if (this.item.type == 1) {
+        this.$router.push("/videoPlay/" + this.item.id);
+      } else {
+        this.$router.push("/mvPlay/" + this.item.id);
+      }
     },
   },
 };
@@ -54,14 +53,12 @@ export default {
 <style lang='less' scoped>
 .videoinfo {
   display: flex;
-  align-items: center;
   margin-bottom: 15px;
-
   .card {
     width: 50%;
     position: relative;
     .image {
-      width: 180px;
+      width: 100%;
       height: auto;
       border-radius: 4px;
       cursor: pointer;
@@ -86,7 +83,7 @@ export default {
       right: 5px;
       overflow: hidden;
     }
-    
+
     .duration {
       font-size: 0.7rem;
       color: white;
@@ -107,14 +104,14 @@ export default {
 
   .info {
     width: 50%;
-    padding: 10px 0px;
     margin-left: 15px;
-    line-height: 35px;
+    padding-top: 10px;
     .name {
       font-size: 0.9rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      margin-bottom: 20px;
     }
     .artist {
       margin-top: 10px;
