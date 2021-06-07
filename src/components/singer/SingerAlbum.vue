@@ -40,11 +40,11 @@
     <!-- 其他专辑 -->
     <div class="content" v-for="(item, index) in albumMusicInfo" :key="index">
       <div class="left">
-        <img :src="item.album.picUrl" class="cover" />
-        <div class="time">{{ item.album.publishTime | dateFormatToYMD }}</div>
+        <img :src="item.picUrl" class="cover" />
+        <div class="time">{{ item.publishTime | dateFormatToYMD }}</div>
       </div>
       <div class="right">
-        <div class="title">{{ item.album.name }}</div>
+        <div class="title">{{ item.name }}</div>
         <el-table
           :data="item.songs"
           stripe
@@ -85,7 +85,11 @@
 import { mixPlayMusic } from "../common/mixin/mixin.js";
 
 // 引入网络请求
-import { getHot50Music, getHotAlbum } from "@/networks/networks.js";
+import {
+  getHot50Music,
+  getHotAlbum,
+  getAlbumInfo,
+} from "@/networks/networks.js";
 
 export default {
   mixins: [mixPlayMusic],
@@ -101,13 +105,13 @@ export default {
       singerId: this.$route.params.id,
       // 歌手热门50首
       hot50Songs: [],
-
-      //50首默认展示10首
+      // 50首默认展示10首
       defaultShow: 10,
-      //当前歌手热门专辑信息(不包含专辑内含的歌曲)
+      // 当前歌手热门专辑信息(不包含专辑内含的歌曲)
       hotAlbum: [],
-      //当前歌手专辑内歌曲信息
+      // 当前歌手专辑内歌曲信息
       albumMusicInfo: [],
+
       // 图片
       top50img: require("../../assets/images/top50.png"),
       playing: require("../../assets/images/playing_pic.png"),
@@ -121,9 +125,9 @@ export default {
 
   created() {
     // 获取歌手热门50首歌
-    this.get_Hot50Music();
+    this.get_hot_50Music();
     // 获取歌手的热门专辑信息
-    this.get_HotAlbum();
+    this.get_hot_album();
   },
   mounted() {
     //监视scroll滚动条
@@ -149,12 +153,12 @@ export default {
         this.isRefreshBool = false;
         this.queryInfo.offset = this.newPage * this.queryInfo.limit;
         this.newPage++;
-        this.get_HotAlbum();
+        this.get_hot_album();
       }
     },
 
     // 获取歌曲热门50首歌
-    get_Hot50Music() {
+    get_hot_50Music() {
       getHot50Music(this.singerId).then((res) => {
         this.hot50Songs = res.data.songs;
         //处理时长数据
@@ -174,16 +178,23 @@ export default {
     },
 
     //获取歌手热门专辑
-    get_HotAlbum() {
+    get_hot_album() {
       getHotAlbum(this.queryInfo).then((res) => {
         this.hotAlbum = res.data.hotAlbums;
         //处理时长数据
         this.hotAlbum.forEach((item) => {
-          const dt = new Date(item.dt);
-          const mm = (dt.getMinutes() + "").padStart(2, "0");
-          const ss = (dt.getSeconds() + "").padStart(2, "0");
-          item.dt = mm + ":" + ss;
+          getAlbumInfo(item.id).then((res2) => {
+            res2.data.songs.forEach((item2) => {
+              const dt = new Date(item2.dt);
+              const mm = (dt.getMinutes() + "").padStart(2, "0");
+              const ss = (dt.getSeconds() + "").padStart(2, "0");
+              item2.dt = mm + ":" + ss;
+            });
+            item.songs.push(...res2.data.songs)
+          });
         });
+        this.albumMusicInfo.push(...this.hotAlbum);
+
         // 防止没有数据还一直加载
         if (res.data.hotAlbums.length > 0) {
           this.isRefreshBool = true;
@@ -191,12 +202,6 @@ export default {
           this.isLoadEnd = true;
         }
       });
-    },
-
-    //分页插件页数改变
-    handleCurrentChange(newPage) {
-      this.queryInfo.offset = (newPage - 1) * this.queryInfo.limit;
-      this.getHotAlbum();
     },
 
     //播放热门五十首

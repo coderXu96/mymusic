@@ -41,11 +41,13 @@
 </template>
 
 <script>
+import { getSingerInfo } from "@/networks/networks.js";
+
 export default {
-  name:'singer',
+  name: "singer",
   data() {
     return {
-      active: '1',
+      active: "1",
       //当前歌手的id
       singerId: this.$route.params.id,
       //当前歌手的信息
@@ -56,26 +58,27 @@ export default {
       },
     };
   },
+  
   created() {
     //获取歌手的信息
-    this.getSingerInfo();
+    this.get_singer_info();
   },
+
   methods: {
-    getSingerInfo() {
-      this.$http
-        .get("artists", { params: { id: this.singerId } })
-        .then((res) => {
-          this.singerInfo = res.data;
-        });
+    get_singer_info() {
+      getSingerInfo(this.singerId).then((res) => {
+        this.singerInfo = res.data;
+      });
     },
+
     singerAlbum() {
       this.$router.replace("/singerAlbum/" + this.singerId);
     },
     singerMv() {
-       this.$router.replace("/singerMv/" + this.singerId);
+      this.$router.replace("/singerMv/" + this.singerId);
     },
     singerDesc() {
-       this.$router.replace("/singerDesc/" + this.singerId);
+      this.$router.replace("/singerDesc/" + this.singerId);
     },
   },
 };

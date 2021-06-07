@@ -140,6 +140,17 @@ export function getVideoCommentList(queryInfo) {
   return axios.get("comment/video", { params: queryInfo })
 }
 
+// 获取歌手信息
+export function getSingerInfo(singerId) {
+  return axios.get("artists", { params: { id: singerId } })
+}
+
+// 获取歌手经历
+export function getSingerDesc(singerId) {
+  return axios.get("artist/desc", { params: { id: singerId } })
+}
+
+
 // 获取歌手热门50首歌
 export function getHot50Music(singerId) {
   return axios.get("artist/top/song", { params: { id: singerId } })
